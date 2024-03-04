@@ -1,0 +1,23 @@
+{
+  "name": "nivkipark-bot",
+  "version": "0.0.0",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240222.0",
+    "typescript": "^5.3.3",
+    "wrangler": "3.30.1"
+  },
+  "platform": "node",
+  "private": true,
+  "scripts": {
+    "start": "wrangler dev",
+    "starttunnel": "cloudflared tunnel --url http://localhost:8787",
+    "registerhook": "curl https://api.telegram.org/bot6751459282:AAHSE2JQn6x-PFS9JQ9_K45ZSmbi5uOTV8k/setWebhook?url=https://hon-sir-opinion-seems.trycloudflare.com",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@grammyjs/storage-cloudflare": "^2.4.2",
+    "@ponomarevlad/grammyjs-conversations": "^1.1.2-web.1",
+    "grammy": "^1.21.1",
+    "nivkipark": "github:TrilipuT/nivkipark"
+  }
+}

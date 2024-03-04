@@ -1,0 +1,14 @@
+name = "nivkipark-bot"
+main = "src/index.ts"
+compatibility_date = "2024-01-29"
+#compatibility_flags = [ "nodejs_compat" ]
+
+
+
+[vars]
+BOT_TOKEN = "6751459282:AAHSE2JQn6x-PFS9JQ9_K45ZSmbi5uOTV8k"
+SECRET_PATH = "registerWebhook"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "677d50fb1f64487ab6b944e487c0aa72"
