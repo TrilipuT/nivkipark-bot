@@ -4,6 +4,10 @@ import {InlineKeyboard, Keyboard} from "grammy";
 import {backToStart} from "./menu";
 import {getBuildingName} from 'nivkipark/src/helpers/buildings'
 
+function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export async function greeting(conversation: Conversation<any>, ctx: MyContext) {
     await ctx.reply(`Вітаю!\nДавайте знайомитись. Поділіться вашим номером телефона`, {
         reply_markup: new Keyboard().requestContact('Поділитись контактом').oneTime().resized()
@@ -11,10 +15,29 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
     // @ts-ignore
     const contactReply = await conversation.wait(':contact');
     if (!contactReply.message?.contact) {
-        conversation.log(contactReply)
         await ctx.reply(`Не зрозумів нічого... \nНатисніть кнопку "Поділитись контактом" знизу 👇`)
         await conversation.skip()
     }
+
+    const statusMessage = await ctx.reply("Звіряємо дані...");
+
+    const response: object[] = await fetch(`https://nivkipark.pages.dev/api/vehicles?type=2&phone=${contactReply.message?.contact.phone_number}`, {
+        headers: {
+            "Content-Type": "application/json",
+        }
+    }).then(response => response.json())
+
+    await sleep(1000)
+    // await statusMessage.editText("Зроблено.")
+    // await sleep(1000)
+    
+    if (!response.length) {
+        await ctx.reply(`Вибачте, ваш номер телефону не верифіковано. Для користування ботом звяжіться з представником ОСББ вашого будинку.\nПісля цього натисніть /start нижче.`, {
+            reply_markup: new Keyboard().text('/start').resized().oneTime()
+        })
+        return
+    }
+
     conversation.session.contact = contactReply.message?.contact;
 
     const keyboard = new InlineKeyboard()
@@ -36,7 +59,6 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
     });
     const buildingReply = await conversation.waitFor("callback_query:data");
     if (!buildingReply.update.callback_query.data) {
-        conversation.log(buildingReply)
         await ctx.reply(`Не зрозумів нічого... \nОберіть один з варіантів будь ласка`)
         await conversation.skip()
     }

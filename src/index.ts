@@ -20,6 +20,8 @@ import {
     createConversation,
 } from "@ponomarevlad/grammyjs-conversations";
 import {KvAdapter} from '@grammyjs/storage-cloudflare';
+import { hydrate, HydrateFlavor } from "@grammyjs/hydrate";
+
 import {greeting} from "./greeting";
 import {list, newRequest} from "./request";
 import {backToStart, MENU_CANCEL, MENU_REQUESTS_LIST, MENU_REQUESTS_NEW,} from "./menu";
@@ -36,7 +38,7 @@ interface SessionData {
     flat: string
 }
 
-export type MyContext = Context & LazySessionFlavor<SessionData> & ConversationFlavor;
+export type MyContext = Context & LazySessionFlavor<SessionData> & ConversationFlavor & HydrateFlavor<Context>;
 
 export default {
     async fetch(
@@ -46,6 +48,7 @@ export default {
     ): Promise<Response> {
         try {
             const bot = new Bot<MyContext>(env.BOT_TOKEN);
+            bot.use(hydrate());
             bot.use(lazySession({
                 storage: new KvAdapter<SessionData>(env.KV),
                 initial: () => ({contact: {}, building: '', flat: ''}),

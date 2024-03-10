@@ -10,7 +10,9 @@ const defaultActionsKeyboard = new Keyboard()
     .text(MENU_REQUESTS_LIST)
     .resized().oneTime();
 
-export const cancelKeyboard = new Keyboard().text(MENU_CANCEL)
+export const cancelKeyboard = new Keyboard()
+    .text(MENU_CANCEL)
+    .resized()
 
 export async function backToStart(ctx: Context, text: string = "Що будем робити?") {
     await ctx.reply(text, {

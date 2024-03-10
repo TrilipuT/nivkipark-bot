@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@grammyjs/hydrate':
+    specifier: ^1.4.1
+    version: 1.4.1(grammy@1.21.1)
   '@grammyjs/storage-cloudflare':
     specifier: ^2.4.2
     version: 2.4.2
@@ -351,6 +354,16 @@ packages:
     resolution: {integrity: sha512-+KpH+QxZU7O4675t3mnkQKcZZg56u+K/Ct2K+N2AZYNVK8kyeo/bI18tI8aPm3tvNNRyTWfj6s5tnGNlcbQRsA==}
     engines: {node: '>=14'}
     dev: true
+
+  /@grammyjs/hydrate@1.4.1(grammy@1.21.1):
+    resolution: {integrity: sha512-xvd7XXoVHEhxBV2M8UHDRYkZlv32JioHfs+0l+eN34mkJJJBchuRDgRY3fkVJko8o1hGFHHLAJJTlEs2OAMolA==}
+    engines: {node: ^12.20.0 || >=14.13.1}
+    peerDependencies:
+      grammy: ^1.20.1
+    dependencies:
+      abort-controller: 3.0.0
+      grammy: 1.21.1
+    dev: false
 
   /@grammyjs/storage-cloudflare@2.4.2:
     resolution: {integrity: sha512-r5lwDEyRRkGN7lQBEy3Qm65BIh8lLHUoDcdOB3N5+hDeuAOBW6q0a2eNFwbmk+9KuwPiRMvlOt/avgMLaoYZ/A==}
