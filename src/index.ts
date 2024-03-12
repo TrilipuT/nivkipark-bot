@@ -20,11 +20,12 @@ import {
     createConversation,
 } from "@ponomarevlad/grammyjs-conversations";
 import {KvAdapter} from '@grammyjs/storage-cloudflare';
-import { hydrate, HydrateFlavor } from "@grammyjs/hydrate";
+import {hydrate, HydrateFlavor} from "@grammyjs/hydrate";
 
 import {greeting} from "./greeting";
 import {list, newRequest} from "./request";
 import {backToStart, MENU_CANCEL, MENU_REQUESTS_LIST, MENU_REQUESTS_NEW,} from "./menu";
+import {isAuthenticated} from "./auth";
 
 
 export interface Env {
@@ -76,14 +77,25 @@ export default {
                     await ctx.conversation.enter("greeting");
                 }
             })
+
+
             bot.on("message:text", async (ctx) => {
                 if (ctx.msg.text == MENU_REQUESTS_NEW) {
-                    await ctx.conversation.enter("newRequest");
+                    // New request
+                    if (await isAuthenticated(ctx)) {
+                        await ctx.conversation.enter("newRequest");
+                    }
                 } else if (ctx.msg.text == MENU_REQUESTS_LIST) {
-                    await backToStart(ctx, await list(ctx))
+                    // Existing requests
+                    if (await isAuthenticated(ctx)) {
+                        await backToStart(ctx, await list(ctx))
+                    }
                 } else if (ctx.msg.text == MENU_CANCEL) {
+                    // Cancel
                     await ctx.conversation.exit()
-                    await backToStart(ctx)
+                    if (await isAuthenticated(ctx)) {
+                        await backToStart(ctx)
+                    }
                 }
             })
 
