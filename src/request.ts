@@ -50,7 +50,7 @@ export async function newRequest(conversation: Conversation<any>, ctx: MyContext
 
         await backToStart(ctx, message)
     } catch (e: any) {
-        await blockedCleanup(e, ctx, conversation)
+        console.log(e);
     }
 }
 
@@ -77,6 +77,6 @@ export async function list(ctx: MyContext) {
 
         return result
     } catch (e: any) {
-        console.log(e.error_message);
+        console.log(e);
     }
 }

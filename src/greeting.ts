@@ -97,6 +97,6 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
         await backToStart(ctx, `Супер, дякую за авторизацію. Перейдем до діла.`)
         return
     } catch (e: any) {
-        await blockedCleanup(e, ctx, conversation)
+        console.log(e);
     }
 }

@@ -8,6 +8,7 @@ export async function blockedCleanup(e, ctx, conversation:boolean|Conversation<a
         handler.session.contact = ''
         handler.session.building = ''
         handler.session.flat = ''
+        handler.session.blocked = 'true'
         handler.session.conversation = ''
         console.log('flushed')
     }
