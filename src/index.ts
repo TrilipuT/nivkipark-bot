@@ -101,7 +101,7 @@ export default {
 
             return webhookCallback(bot, "cloudflare-mod")(request);
         } catch (e: any) {
-            return new Response(e.message);
+            console.log(e.error_message);
         }
     },
 };

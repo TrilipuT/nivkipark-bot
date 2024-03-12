@@ -1,6 +1,7 @@
 import {Keyboard} from "grammy";
+import {MyContext} from "./index";
 
-export async function isAuthenticated(ctx) {
+export async function isAuthenticated(ctx:MyContext) {
     await ctx.session
     const isAuth = ctx.session.contact.phone_number && await ctx.session.building && await ctx.session.flat
     if (!isAuth) {
