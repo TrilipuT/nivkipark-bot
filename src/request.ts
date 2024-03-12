@@ -1,7 +1,7 @@
 import {Conversation} from "@ponomarevlad/grammyjs-conversations";
 import type {MyContext} from "./index";
 import {backToStart, cancelKeyboard, MENU_CANCEL} from "./menu";
-import {blockedCleanup} from "./errors";
+import {blockedLogger} from "./errors";
 
 export async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
     try {
@@ -50,7 +50,7 @@ export async function newRequest(conversation: Conversation<any>, ctx: MyContext
 
         await backToStart(ctx, message)
     } catch (e: any) {
-        console.log(e);
+        blockedLogger(e)
     }
 }
 
@@ -77,6 +77,6 @@ export async function list(ctx: MyContext) {
 
         return result
     } catch (e: any) {
-        console.log(e);
+        blockedLogger(e)
     }
 }

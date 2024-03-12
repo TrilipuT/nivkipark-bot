@@ -3,7 +3,7 @@ import type {MyContext} from "./index";
 import {InlineKeyboard, Keyboard} from "grammy";
 import {backToStart} from "./menu";
 import {getBuildingName} from 'nivkipark/src/helpers/buildings'
-import {blockedCleanup} from "./errors";
+import {blockedLogger} from "./errors";
 
 
 export async function greeting(conversation: Conversation<any>, ctx: MyContext) {
@@ -97,6 +97,6 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
         await backToStart(ctx, `Супер, дякую за авторизацію. Перейдем до діла.`)
         return
     } catch (e: any) {
-        console.log(e);
+        blockedLogger(e)
     }
 }

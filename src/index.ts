@@ -26,6 +26,7 @@ import {greeting} from "./greeting";
 import {list, newRequest} from "./request";
 import {backToStart, MENU_CANCEL, MENU_REQUESTS_LIST, MENU_REQUESTS_NEW,} from "./menu";
 import {isAuthenticated} from "./auth";
+import {blockedLogger} from "./errors";
 
 
 export interface Env {
@@ -101,7 +102,7 @@ export default {
 
             return webhookCallback(bot, "cloudflare-mod")(request);
         } catch (e: any) {
-            console.log(e);
+            blockedLogger(e)
         }
     },
 };
