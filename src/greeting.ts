@@ -38,6 +38,7 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
 
             }
             // await statusMessage.delete().catch(() => {})
+            conversation.session.contact = contactReply.message?.contact;
 
             if (!response?.length) {
                 await ctx.reply(`Вибачте, ваш номер телефону не верифіковано. Для користування ботом звяжіться з представником ОСББ вашого будинку.\nПісля цього натисніть /start нижче.`, {
@@ -45,8 +46,6 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
                 })
                 return
             }
-
-            conversation.session.contact = contactReply.message?.contact;
         }
         // ========= End ask for contact =========
 
@@ -94,7 +93,7 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
         conversation.session.flat = flatReply.message.text
         // ========= End ask for flat =========
 
-        await backToStart(ctx, `Супер, дякую за авторизацію. Перейдемо до діла.`)
+        await backToStart(ctx, `Супер, дякую за авторизацію. Перейдемо до справи.`)
         return
     } catch (e: any) {
         blockedLogger(e)
