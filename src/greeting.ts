@@ -94,7 +94,7 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
         conversation.session.flat = flatReply.message.text
         // ========= End ask for flat =========
 
-        await backToStart(ctx, `Супер, дякую за авторизацію. Перейдем до діла.`)
+        await backToStart(ctx, `Супер, дякую за авторизацію. Перейдемо до діла.`)
         return
     } catch (e: any) {
         blockedLogger(e)
