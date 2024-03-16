@@ -1,9 +1,13 @@
-import {Conversation} from "@ponomarevlad/grammyjs-conversations";
-import type {MyContext} from "./index";
-import {backToStart, cancelKeyboard, MENU_CANCEL} from "./menu";
-import {blockedLogger} from "./errors";
+import {Conversation, createConversation} from "@ponomarevlad/grammyjs-conversations";
+import type {MyContext} from "../index";
+import {backToStart, cancelKeyboard, MENU_CANCEL, MENU_REQUESTS_LIST, MENU_REQUESTS_NEW} from "../helpers/menu";
+import {blockedLogger} from "../helpers/errors";
+import {Composer} from "grammy";
+import {isAuthenticated} from "../helpers/auth";
 
-export async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
+const bot = new Composer<MyContext>();
+
+async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
     try {
         await ctx.reply(`Введіть номер авто (латинськими літерами)`, {
             reply_markup: cancelKeyboard
@@ -54,7 +58,7 @@ export async function newRequest(conversation: Conversation<any>, ctx: MyContext
     }
 }
 
-export async function list(ctx: MyContext) {
+async function list(ctx: MyContext) {
     try {
         await ctx.session
         const response: object[] = await fetch('https://nivkipark.pages.dev/api/vehicles?phone=' + ctx.session.contact.phone_number + '&type=1', {
@@ -67,8 +71,9 @@ export async function list(ctx: MyContext) {
         let result = ''
         if (response?.length) {
             let replies: string[] = []
-            response.forEach((el: object) => {
-                replies.push(`<u>${el.plate}</u> - діє до <code>${el.date_expire}</code>`)
+            response.forEach((el, index) => {
+                let icon = ['🚘', '🚖'][index % 2]
+                replies.push(`${icon} <u>${el.plate}</u> - діє до <code>${el.date_expire.replace('T', ' ')}</code>`)
             })
             result = 'Активні заявки:\n' + replies.join('\n')
         } else {
@@ -80,3 +85,24 @@ export async function list(ctx: MyContext) {
         blockedLogger(e)
     }
 }
+
+bot.use(createConversation(newRequest));
+
+// const authed = bot.filter(async ctx => await isAuthenticated(ctx))
+
+bot.filter(ctx => ctx.msg?.text == MENU_REQUESTS_NEW,
+    // New request
+    async (ctx, next) => {
+        if (await isAuthenticated(ctx)) {
+            await ctx.conversation.enter("newRequest");
+        }
+    });
+bot.filter(ctx => ctx.msg?.text == MENU_REQUESTS_LIST,
+    // Existing requests
+    async (ctx, next) => {
+        if (await isAuthenticated(ctx)) {
+            await backToStart(ctx, await list(ctx))
+        }
+    })
+
+export default bot

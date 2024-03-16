@@ -17,17 +17,16 @@ import {
 import {
     type ConversationFlavor,
     conversations,
-    createConversation,
 } from "@ponomarevlad/grammyjs-conversations";
 import {KvAdapter} from '@grammyjs/storage-cloudflare';
 import {hydrate, HydrateFlavor} from "@grammyjs/hydrate";
-
-import {greeting} from "./greeting";
-import {list, newRequest} from "./request";
-import {backToStart, MENU_CANCEL, MENU_REQUESTS_LIST, MENU_REQUESTS_NEW,} from "./menu";
-import {isAuthenticated} from "./auth";
-import {blockedLogger} from "./errors";
-
+import greeting from "./conversations/greeting";
+import requests from "./conversations/request";
+import myVehicles from "./conversations/myVehicles";
+import auth from "./helpers/auth";
+import {backToStart, MENU_CANCEL, MENU_MY_VEHICLES, MENU_REQUESTS_LIST, MENU_REQUESTS_NEW,} from "./helpers/menu";
+import {isAuthenticated} from "./helpers/auth";
+import {blockedLogger} from "./helpers/errors";
 
 export interface Env {
     BOT_TOKEN: string
@@ -35,7 +34,12 @@ export interface Env {
 }
 
 interface SessionData {
-    contact: object,
+    contact: {
+        phone_number: string,
+        first_name: string,
+        last_name: string,
+        user_id: number
+    },
     building: string,
     flat: string
 }
@@ -49,58 +53,58 @@ export default {
         ctx: ExecutionContext
     ): Promise<Response> {
         try {
-            const bot = new Bot<MyContext>(env.BOT_TOKEN);
+            const bot = new Bot<MyContext>(env.BOT_TOKEN)
             bot.use(hydrate());
             bot.use(lazySession({
                 storage: new KvAdapter<SessionData>(env.KV),
-                initial: () => ({contact: {}, building: '', flat: ''}),
+                initial: () => ({
+                    contact: {
+                        phone_number: '',
+                        first_name: '',
+                        last_name: '',
+                        user_id: 0
+                    },
+                    building: '',
+                    flat: ''
+                }),
             }))
-            bot.use(conversations());
+            bot.use(conversations())
 
             // Conv
-            bot.use(createConversation(greeting));
-            bot.use(createConversation(newRequest));
+
+            bot.use(greeting)
+            bot.use(requests)
+            bot.use(myVehicles)
+            bot.use(auth)
 
 
-            bot.command("auth", async (ctx) => {
-                await ctx.conversation.enter("greeting");
-            })
             bot.command("cancel", async (ctx) => {
-                await ctx.conversation.exit();
+                await ctx.conversation.exit()
                 await backToStart(ctx)
             })
+
             bot.command("start", async (ctx) => {
                 await ctx.session
                 // @ts-ignore
                 if (ctx.session.contact?.phone_number && ctx.session.building && ctx.session.flat) {
                     await backToStart(ctx)
                 } else {
-                    await ctx.conversation.enter("greeting");
+                    await ctx.conversation.enter("greeting")
                 }
             })
 
 
-            bot.on("message:text", async (ctx) => {
-                if (ctx.msg.text == MENU_REQUESTS_NEW) {
-                    // New request
-                    if (await isAuthenticated(ctx)) {
-                        await ctx.conversation.enter("newRequest");
-                    }
-                } else if (ctx.msg.text == MENU_REQUESTS_LIST) {
-                    // Existing requests
-                    if (await isAuthenticated(ctx)) {
-                        await backToStart(ctx, await list(ctx))
-                    }
-                } else if (ctx.msg.text == MENU_CANCEL) {
+            bot.filter(ctx => ctx.msg?.text == MENU_CANCEL,
+                async (ctx, next) => {
                     // Cancel
                     await ctx.conversation.exit()
+                    await ctx.reply('Ок, відміняємо.')
                     if (await isAuthenticated(ctx)) {
                         await backToStart(ctx)
                     }
-                }
-            })
+                })
 
-            return webhookCallback(bot, "cloudflare-mod")(request);
+            return webhookCallback(bot, "cloudflare-mod")(request)
         } catch (e: any) {
             blockedLogger(e)
         }

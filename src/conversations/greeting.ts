@@ -1,10 +1,12 @@
-import type {Conversation} from "@ponomarevlad/grammyjs-conversations";
-import type {MyContext} from "./index";
-import {InlineKeyboard, Keyboard} from "grammy";
-import {backToStart} from "./menu";
+import {Conversation, createConversation} from "@ponomarevlad/grammyjs-conversations";
+import type {MyContext} from "../index";
+import {Composer, InlineKeyboard, Keyboard} from "grammy";
+import {backToStart} from "../helpers/menu";
+// @ts-ignore
 import {getBuildingName} from 'nivkipark/src/helpers/buildings'
-import {blockedLogger} from "./errors";
+import {blockedLogger} from "../helpers/errors";
 
+const bot = new Composer<MyContext>();
 
 export async function greeting(conversation: Conversation<any>, ctx: MyContext) {
     try {
@@ -99,3 +101,7 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
         blockedLogger(e)
     }
 }
+
+bot.use(createConversation(greeting))
+
+export default bot
