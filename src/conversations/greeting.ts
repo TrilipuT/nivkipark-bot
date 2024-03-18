@@ -22,9 +22,12 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
         });
         // ========= Check for contact =========
         if (contactReply.message?.contact) {
+            // set contact into format without + and -
+            contactReply.message.contact.phone_number = contactReply.message?.contact.phone_number.replace('+','').replace('-','')
+
             const statusMessage = await ctx.reply("Звіряємо дані...");
             const response = await conversation.external(async () => {
-                const request: object[] = await fetch(`https://nivkipark.pages.dev/api/vehicles?type=2&phones=${contactReply.message?.contact.phone_number}`, {
+                const request: object[] = await fetch(`https://nivkipark.pages.dev/api/vehicles?type=2&phones=${contactReply.message.contact.phone_number}`, {
                     headers: {
                         "Content-Type": "application/json",
                     }
@@ -40,7 +43,7 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
 
             }
             // await statusMessage.delete().catch(() => {})
-            conversation.session.contact = contactReply.message?.contact;
+            conversation.session.contact = contactReply.message.contact;
 
             if (!response?.length) {
                 await ctx.reply(`Вибачте, ваш номер телефону не верифіковано. Для користування ботом звяжіться з представником ОСББ вашого будинку.\nПісля цього натисніть /start нижче.`, {
@@ -77,7 +80,6 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
             }
         });
         if (buildingReply.update.callback_query.data) {
-            // await ctx.reply(`Не зрозумів нічого... \nОберіть один з варіантів будь ласка`)
             conversation.session.building = buildingReply.update.callback_query.data
         }
 
