@@ -9,15 +9,15 @@ const bot = new Composer<MyContext>();
 
 async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
     try {
-        await ctx.reply(`Введіть номер авто (латинськими літерами)`, {
+        await ctx.reply(`Введіть номер авто:`, {
             reply_markup: cancelKeyboard
         })
         // @ts-ignore
-        const plateReply = await conversation.wait('message:text')
+        const plateReply = await conversation.waitFor('message:text')
         const re = new RegExp('^[a-zA-Zа-яА-Я0-9]*$')
         if (!re.test(plateReply.message.text)) {
             if (plateReply.message.text != MENU_CANCEL) {
-                await ctx.reply(`Помилка в номері.\nбез пробілів і спецзнаків. тільки букви і цифри.`)
+                await ctx.reply(`Помилка в номері.\nБез пробілів і спецзнаків. Тільки букви і цифри.`)
             }
             await conversation.skip()
         }
