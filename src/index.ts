@@ -27,11 +27,13 @@ import auth from "./helpers/auth";
 import {backToStart, MENU_CANCEL, MENU_MY_VEHICLES, MENU_REQUESTS_LIST, MENU_REQUESTS_NEW,} from "./helpers/menu";
 import {isAuthenticated} from "./helpers/auth";
 import {blockedLogger} from "./helpers/errors";
+import {Toucan} from "toucan-js";
 
 export interface Env {
     BOT_TOKEN: string
     KV: KVNamespace<string>
     ENVIRONMENT: string
+    SENTRY_DSN: string
 }
 
 interface SessionData {
@@ -46,7 +48,7 @@ interface SessionData {
 }
 
 export type MyContext = Context & LazySessionFlavor<SessionData> & ConversationFlavor & HydrateFlavor<Context> & {
-    config: { env: String }
+    config: { env: String, sentry: Toucan }
 };
 
 export default {
@@ -56,10 +58,19 @@ export default {
         ctx: ExecutionContext
     ): Promise<Response> {
         try {
+            const sentry = new Toucan({
+                environment: env?.ENVIRONMENT,
+                dsn: env.SENTRY_DSN,
+                release: '1.0.0',
+                ctx,
+                request,
+            });
+
             const bot = new Bot<MyContext>(env.BOT_TOKEN)
             bot.use(async (ctx, next) => {
                 ctx.config = {
                     env: env?.ENVIRONMENT ?? '',
+                    sentry: sentry
                 };
                 await next();
             });
@@ -115,7 +126,7 @@ export default {
 
             return webhookCallback(bot, "cloudflare-mod")(request)
         } catch (e: any) {
-            blockedLogger(e)
+            blockedLogger(e, ctx)
         }
     },
 };

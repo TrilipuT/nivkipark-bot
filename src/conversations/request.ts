@@ -52,7 +52,7 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
 
         await backToStart(ctx, message)
     } catch (e: any) {
-        blockedLogger(e)
+        blockedLogger(e,ctx)
     }
 }
 
@@ -85,7 +85,7 @@ async function list(ctx: MyContext) {
         })
 
     } catch (e: any) {
-        blockedLogger(e)
+        blockedLogger(e,ctx)
     }
 }
 

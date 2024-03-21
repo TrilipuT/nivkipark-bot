@@ -40,7 +40,7 @@ bot.filter(ctx => ctx.msg?.text == MENU_MY_VEHICLES,
                 })
 
             } catch (e: any) {
-                blockedLogger(e)
+                blockedLogger(e, ctx)
             }
 
             await backToStart(ctx)

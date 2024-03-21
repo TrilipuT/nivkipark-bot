@@ -98,7 +98,7 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
         await backToStart(ctx, `Супер, дякую за авторизацію. Перейдемо до справи.`)
         return
     } catch (e: any) {
-        blockedLogger(e)
+        blockedLogger(e, ctx)
     }
 }
 

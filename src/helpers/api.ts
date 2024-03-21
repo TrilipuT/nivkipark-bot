@@ -1,7 +1,7 @@
 import {MyContext} from "../index";
 
 function getApiBase(ctx: MyContext): String {
-    return ctx.config.env == 'development' ? 'http://localhost:8788' : 'https://nivkipark.pages.dev'
+    return ctx.config?.env == 'development' ? 'http://localhost:8788' : 'https://nivkipark.pages.dev'
 }
 
 export async function addVehicle(ctx: MyContext, data: {}) {
