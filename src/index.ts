@@ -31,6 +31,7 @@ import {blockedLogger} from "./helpers/errors";
 export interface Env {
     BOT_TOKEN: string
     KV: KVNamespace<string>
+    ENVIRONMENT: string
 }
 
 interface SessionData {
@@ -44,7 +45,9 @@ interface SessionData {
     flat: string
 }
 
-export type MyContext = Context & LazySessionFlavor<SessionData> & ConversationFlavor & HydrateFlavor<Context>;
+export type MyContext = Context & LazySessionFlavor<SessionData> & ConversationFlavor & HydrateFlavor<Context> & {
+    config: { env: String }
+};
 
 export default {
     async fetch(
@@ -54,6 +57,12 @@ export default {
     ): Promise<Response> {
         try {
             const bot = new Bot<MyContext>(env.BOT_TOKEN)
+            bot.use(async (ctx, next) => {
+                ctx.config = {
+                    env: env?.ENVIRONMENT ?? '',
+                };
+                await next();
+            });
             bot.use(hydrate());
             bot.use(lazySession({
                 storage: new KvAdapter<SessionData>(env.KV),

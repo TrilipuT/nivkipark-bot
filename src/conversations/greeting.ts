@@ -5,6 +5,7 @@ import {backToStart} from "../helpers/menu";
 // @ts-ignore
 import {getBuildingName} from 'nivkipark/src/helpers/buildings'
 import {blockedLogger} from "../helpers/errors";
+import {getVehicles} from "../helpers/api";
 
 const bot = new Composer<MyContext>();
 
@@ -23,18 +24,14 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
         // ========= Check for contact =========
         if (contactReply.message?.contact) {
             // set contact into format without + and -
-            contactReply.message.contact.phone_number = contactReply.message?.contact.phone_number.replace('+','').replace('-','')
+            contactReply.message.contact.phone_number = contactReply.message?.contact.phone_number.replace('+', '').replace('-', '')
 
             const statusMessage = await ctx.reply("Звіряємо дані...");
-            const response = await conversation.external(async () => {
-                const request: object[] = await fetch(`https://nivkipark.pages.dev/api/vehicles?type=2&phones=${contactReply.message.contact.phone_number}`, {
-                    headers: {
-                        "Content-Type": "application/json",
-                    }
-                }).then(response => response.json())
+            const response = await conversation.external(async () => await getVehicles(ctx, {
+                phones: contactReply.message.contact.phone_number,
+                type: 2
+            }))
 
-                return request
-            })
             try {
                 await conversation.sleep(1000)
                 await statusMessage.editText("Зроблено.")
@@ -79,6 +76,7 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
                 await ctx.reply(`Оберіть один з варіантів натиснувши на копку вище 👆`)
             }
         });
+        await buildingReply.answerCallbackQuery({text: 'Дякую!'})
         if (buildingReply.update.callback_query.data) {
             conversation.session.building = buildingReply.update.callback_query.data
         }
