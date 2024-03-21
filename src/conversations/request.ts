@@ -98,6 +98,7 @@ bot.callbackQuery(
         const data = requestData.unpack(ctx.callbackQuery.data)
         const result = await deleteVehicle(ctx, data.id)
         if (result.ok) {
+            ctx.answerCallbackQuery()
             await ctx.reply('Видалено!')
             await list(ctx)
         } else {
