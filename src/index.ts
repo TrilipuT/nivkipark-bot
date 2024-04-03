@@ -57,16 +57,16 @@ export default {
         env: Env,
         ctx: ExecutionContext
     ): Promise<Response> {
-        try {
-            const sentry = new Toucan({
-                environment: env?.ENVIRONMENT,
-                dsn: env.SENTRY_DSN,
-                release: '1.0.0',
-                ctx,
-                request,
-            });
 
-            const bot = new Bot<MyContext>(env.BOT_TOKEN)
+        const sentry = new Toucan({
+            environment: env?.ENVIRONMENT,
+            dsn: env.SENTRY_DSN,
+            release: '1.0.0',
+            ctx,
+            request,
+        });
+        const bot = new Bot<MyContext>(env.BOT_TOKEN)
+        try {
             bot.use(async (ctx, next) => {
                 ctx.config = {
                     env: env?.ENVIRONMENT ?? '',
@@ -124,9 +124,10 @@ export default {
                     }
                 })
 
-            return webhookCallback(bot, "cloudflare-mod")(request)
+
         } catch (e: any) {
-            blockedLogger(e, ctx)
+            sentry.captureException(e);
         }
+        return webhookCallback(bot, "cloudflare-mod")(request)
     },
 };
