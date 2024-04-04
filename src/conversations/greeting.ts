@@ -4,7 +4,7 @@ import {Composer, InlineKeyboard, Keyboard} from "grammy";
 import {backToStart} from "../helpers/menu";
 // @ts-ignore
 import {getBuildingName} from 'nivkipark/src/helpers/buildings'
-import {blockedLogger} from "../helpers/errors";
+import {handleException} from "../helpers/errors";
 import {getVehicles} from "../helpers/api";
 
 const bot = new Composer<MyContext>();
@@ -98,7 +98,7 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
         await backToStart(ctx, `Супер, дякую за авторизацію. Перейдемо до справи.`)
         return
     } catch (e: any) {
-        blockedLogger(e, ctx)
+        await handleException(e, ctx)
     }
 }
 

@@ -1,7 +1,7 @@
 import {Conversation, createConversation} from "@ponomarevlad/grammyjs-conversations";
 import type {MyContext} from "../index";
 import {backToStart, cancelKeyboard, MENU_CANCEL, MENU_REQUESTS_LIST, MENU_REQUESTS_NEW} from "../helpers/menu";
-import {blockedLogger} from "../helpers/errors";
+import {handleException} from "../helpers/errors";
 import {Composer, InlineKeyboard} from "grammy";
 import {isAuthenticated} from "../helpers/auth";
 import type {InlineKeyboardButton} from "grammy/out/types";
@@ -52,7 +52,7 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
 
         await backToStart(ctx, message)
     } catch (e: any) {
-        blockedLogger(e,ctx)
+        await handleException(e,ctx)
     }
 }
 
@@ -85,7 +85,7 @@ async function list(ctx: MyContext) {
         })
 
     } catch (e: any) {
-        blockedLogger(e,ctx)
+        await handleException(e,ctx)
     }
 }
 

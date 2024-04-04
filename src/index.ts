@@ -26,7 +26,6 @@ import myVehicles from "./conversations/myVehicles";
 import auth from "./helpers/auth";
 import {backToStart, MENU_CANCEL, MENU_MY_VEHICLES, MENU_REQUESTS_LIST, MENU_REQUESTS_NEW,} from "./helpers/menu";
 import {isAuthenticated} from "./helpers/auth";
-import {blockedLogger} from "./helpers/errors";
 import {Toucan} from "toucan-js";
 
 export interface Env {
@@ -48,7 +47,7 @@ interface SessionData {
 }
 
 export type MyContext = Context & LazySessionFlavor<SessionData> & ConversationFlavor & HydrateFlavor<Context> & {
-    config: { env: String, sentry: Toucan }
+    config: { env: String, dsn: String, sentry?: Toucan }
 };
 
 export default {
@@ -58,22 +57,15 @@ export default {
         ctx: ExecutionContext
     ): Promise<Response> {
 
-        const sentry = new Toucan({
-            environment: env?.ENVIRONMENT,
-            dsn: env.SENTRY_DSN,
-            release: '1.0.0',
-            ctx,
-            request,
-        });
         const bot = new Bot<MyContext>(env.BOT_TOKEN)
+        bot.use(async (ctx, next) => {
+            ctx.config = {
+                env: env?.ENVIRONMENT ?? '',
+                dsn: env.SENTRY_DSN,
+            };
+            await next();
+        });
         try {
-            bot.use(async (ctx, next) => {
-                ctx.config = {
-                    env: env?.ENVIRONMENT ?? '',
-                    sentry: sentry
-                };
-                await next();
-            });
             bot.use(hydrate());
             bot.use(lazySession({
                 storage: new KvAdapter<SessionData>(env.KV),
@@ -88,6 +80,17 @@ export default {
                     flat: ''
                 }),
             }))
+            /*bot.use(async (ctx,next)=>{
+                let rr = await isAuthenticated(ctx)
+                if(rr){
+                    console.log('pass')
+                    await next()
+                } else {
+                    console.log('not pass')
+                }
+
+
+            })*/
             bot.use(conversations())
 
             // Conv
@@ -126,6 +129,12 @@ export default {
 
 
         } catch (e: any) {
+            const sentry = new Toucan({
+                environment: env?.ENVIRONMENT,
+                dsn: env.SENTRY_DSN,
+                ctx,
+                request,
+            });
             sentry.captureException(e);
         }
         return webhookCallback(bot, "cloudflare-mod")(request)

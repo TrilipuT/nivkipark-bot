@@ -3,7 +3,7 @@ import {
     backToStart,
     MENU_MY_VEHICLES,
 } from "../helpers/menu";
-import {blockedLogger} from "../helpers/errors";
+import {handleException} from "../helpers/errors";
 import {Composer, InlineKeyboard} from "grammy";
 import {isAuthenticated} from "../helpers/auth";
 import type {InlineKeyboardButton} from "grammy/out/types";
@@ -39,11 +39,11 @@ bot.filter(ctx => ctx.msg?.text == MENU_MY_VEHICLES,
                     parse_mode: 'HTML'
                 })
 
-            } catch (e: any) {
-                blockedLogger(e, ctx)
-            }
 
             await backToStart(ctx)
+            } catch (e: any) {
+                await handleException(e, ctx)
+            }
         }
     })
 
