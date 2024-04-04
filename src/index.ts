@@ -91,6 +91,12 @@ export default {
 
 
             })*/
+            bot.use(async (ctx, next) => {
+                if (ctx.config?.env != 'development') {
+                    console.log(ctx.message)
+                }
+                await next();
+            });
             bot.use(conversations())
 
             // Conv
