@@ -19,7 +19,7 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
         })
         // @ts-ignore
         const plateReply = await conversation.waitFor('message:text')
-        const re = new RegExp('^[a-zA-Zа-яА-Я0-9]*$')
+        const re = new RegExp('^[a-zA-Zа-яґєіїА-ЯҐЄІЇ0-9]*$')
         if (!re.test(plateReply.message.text)) {
             if (plateReply.message.text != MENU_CANCEL) {
                 await ctx.reply("Помилка в номері.\n<em>Без пробілів і спецзнаків. Тільки букви і цифри.</em>", {parse_mode: 'HTML'})
