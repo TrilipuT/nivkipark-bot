@@ -8,6 +8,7 @@ import {Composer, InlineKeyboard} from "grammy";
 import {isAuthenticated} from "../helpers/auth";
 import type {InlineKeyboardButton} from "grammy/out/types";
 import {getVehicles} from "../helpers/api";
+import {LocalDate} from "../helpers/date";
 
 const bot = new Composer<MyContext>();
 
@@ -17,16 +18,16 @@ bot.filter(ctx => ctx.msg?.text == MENU_MY_VEHICLES,
         if (await isAuthenticated(ctx)) {
             try {
                 await ctx.session
-                const response = await getVehicles(ctx, {phones:ctx.session.contact.phone_number,type:2})
+                const response = await getVehicles(ctx, {phones: ctx.session.contact.phone_number, type: 2})
 
                 let result = ''
                 let buttons: InlineKeyboardButton[][] = []
                 if (response?.length) {
                     let replies: string[] = []
-
                     response.forEach((el, index) => {
+                        let date_expire = LocalDate.parse(el.date_expire)
                         let icon = ['🚘', '🚖'][index % 2]
-                        replies.push(`${icon} <u>${el.plate}</u> - діє до <code>${el.date_expire.replace('T00:00:00', '')}</code>`)
+                        replies.push(`${icon} <u>${el.plate}</u> - діє до <code>${date_expire.toLocaleDateString()}</code>`)
                         buttons.push([InlineKeyboard.text(`Видалити ${icon}${el.plate}`, `delete:${el.plate}`)])
                     })
                     result = 'Мої авто:\n' + replies.join('\n')
@@ -40,7 +41,7 @@ bot.filter(ctx => ctx.msg?.text == MENU_MY_VEHICLES,
                 })
 
 
-            await backToStart(ctx)
+                await backToStart(ctx)
             } catch (e: any) {
                 await handleException(e, ctx)
             }

@@ -7,6 +7,7 @@ import {isAuthenticated} from "../helpers/auth";
 import type {InlineKeyboardButton} from "grammy/out/types";
 import {createCallbackData} from "callback-data";
 import {addVehicle, deleteVehicle, getVehicles} from "../helpers/api";
+import {LocalDate} from '../helpers/date'
 
 const bot = new Composer<MyContext>();
 const requestData = createCallbackData('request', {id: Number})
@@ -45,14 +46,14 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
         }
 
         const result = await addVehicle(ctx, data)
-        let message = `Авто з номером ${plate} додано.\nТермін дії 24 години - до ${date_expire.toLocaleString('uk-UA')}.`
+        let message = `Авто з номером ${plate} додано.\nТермін дії 24 години - до ${new LocalDate(date_expire).toLocaleString()}.`
         if (!result.ok) {
             message = 'Вибачте, сталась помилка. Спробуйте надіслати заявку пізніше.'
         }
 
         await backToStart(ctx, message)
     } catch (e: any) {
-        await handleException(e,ctx)
+        await handleException(e, ctx)
     }
 }
 
@@ -70,8 +71,9 @@ async function list(ctx: MyContext) {
         if (response?.length) {
             let replies: string[] = []
             response.forEach((el, index) => {
+                let date_expire = LocalDate.parse(el.date_expire)
                 let icon = ['🚘', '🚖'][index % 2]
-                replies.push(`${icon} <u>${el.plate}</u> - діє до <code>${el.date_expire.replace('T', ' ')}</code>`)
+                replies.push(`${icon} <u>${el.plate}</u> - діє до <code>${date_expire.toLocaleString()}</code>`)
                 buttons.push([InlineKeyboard.text(`Видалити ${icon}${el.plate}`, requestData.pack({id: el.id}))])
             })
             result = 'Активні заявки:\n' + replies.join('\n')
@@ -85,7 +87,7 @@ async function list(ctx: MyContext) {
         })
 
     } catch (e: any) {
-        await handleException(e,ctx)
+        await handleException(e, ctx)
     }
 }
 
