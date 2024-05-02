@@ -29,7 +29,7 @@ import {isAuthenticated} from "./helpers/auth";
 import {Toucan} from "toucan-js";
 
 export interface Env {
-    BOT_TOKEN: string
+    TOKEN: string
     KV: KVNamespace<string>
     ENVIRONMENT: string
     SENTRY_DSN: string
@@ -57,7 +57,7 @@ export default {
         ctx: ExecutionContext
     ): Promise<Response> {
 
-        const bot = new Bot<MyContext>(env.BOT_TOKEN)
+        const bot = new Bot<MyContext>(env.TOKEN)
         bot.use(async (ctx, next) => {
             ctx.config = {
                 env: env?.ENVIRONMENT ?? '',

@@ -25,8 +25,29 @@ export async function getVehicles(ctx: MyContext, data: {}) {
     return response
 }
 
-export async function deleteVehicle(ctx: MyContext, id: Number) {
-    return await fetch(`${getApiBase(ctx)}/api/vehicles?id=${id}`, {
+export async function getRequests(ctx: MyContext, data: {}) {
+    const string = new URLSearchParams(data).toString()
+    const response: [object] = await fetch(`${getApiBase(ctx)}/api/requests?${string}`, {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+        }
+    }).then(response => response.json())
+    return response
+}
+
+export async function addRequest(ctx: MyContext, data: {}) {
+    return await fetch(`${getApiBase(ctx)}/api/requests`, {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data)
+    })
+}
+
+export async function deleteRequest(ctx: MyContext, id: Number) {
+    return await fetch(`${getApiBase(ctx)}/api/requests?id=${id}`, {
         method: 'DELETE',
         headers: {
             "Content-Type": "application/json",

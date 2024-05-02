@@ -6,7 +6,7 @@ import {Composer, InlineKeyboard} from "grammy";
 import {isAuthenticated} from "../helpers/auth";
 import type {InlineKeyboardButton} from "grammy/out/types";
 import {createCallbackData} from "callback-data";
-import {addVehicle, deleteVehicle, getVehicles} from "../helpers/api";
+import {addRequest, deleteRequest, getRequests} from "../helpers/api";
 import {LocalDate} from '../helpers/date'
 
 const bot = new Composer<MyContext>();
@@ -41,11 +41,11 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
             'flat': conversation.session.flat,
             'type': 1,
             'phone': conversation.session.contact.phone_number,
-            'date_added': date_added.toISOString().slice(0, 19),
-            'date_expire': date_expire.toISOString().slice(0, 19),
+            'date_added': date_added.toISOString(),
+            'date_expire': date_expire.toISOString(),
         }
 
-        const result = await addVehicle(ctx, data)
+        const result = await addRequest(ctx, data)
         let message = `Авто з номером ${plate} додано.\nТермін дії 24 години - до ${new LocalDate(date_expire).toLocaleString()}.`
         if (!result.ok) {
             message = 'Вибачте, сталась помилка. Спробуйте надіслати заявку пізніше.'
@@ -60,9 +60,8 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
 async function list(ctx: MyContext) {
     try {
         await ctx.session
-        const response = await getVehicles(ctx, {
+        const response = await getRequests(ctx, {
             phone: ctx.session.contact.phone_number,
-            type: 1
         })
 
         let result = ''
@@ -71,7 +70,7 @@ async function list(ctx: MyContext) {
         if (response?.length) {
             let replies: string[] = []
             response.forEach((el, index) => {
-                let date_expire = LocalDate.parse(el.date_expire)
+                let date_expire = LocalDate.parse(el.expireAt)
                 let icon = ['🚘', '🚖'][index % 2]
                 replies.push(`${icon} <u>${el.plate}</u> - діє до <code>${date_expire.toLocaleString()}</code>`)
                 buttons.push([InlineKeyboard.text(`Видалити ${icon}${el.plate}`, requestData.pack({id: el.id}))])
@@ -98,7 +97,7 @@ bot.callbackQuery(
     requestData.filter(),
     async (ctx) => {
         const data = requestData.unpack(ctx.callbackQuery.data)
-        const result = await deleteVehicle(ctx, data.id)
+        const result = await deleteRequest(ctx, data.id)
         if (result.ok) {
             ctx.answerCallbackQuery()
             await ctx.reply('Видалено!')

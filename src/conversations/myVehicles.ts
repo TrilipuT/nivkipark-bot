@@ -18,14 +18,13 @@ bot.filter(ctx => ctx.msg?.text == MENU_MY_VEHICLES,
         if (await isAuthenticated(ctx)) {
             try {
                 await ctx.session
-                const response = await getVehicles(ctx, {phones: ctx.session.contact.phone_number, type: 2})
-
+                const response = await getVehicles(ctx, {phones: ctx.session.contact.phone_number})
                 let result = ''
                 let buttons: InlineKeyboardButton[][] = []
                 if (response?.length) {
                     let replies: string[] = []
                     response.forEach((el, index) => {
-                        let date_expire = LocalDate.parse(el.date_expire)
+                        let date_expire = LocalDate.parse(el.expireAt)
                         let icon = ['🚘', '🚖'][index % 2]
                         replies.push(`${icon} <u>${el.plate}</u> - діє до <code>${date_expire.toLocaleDateString()}</code>`)
                         buttons.push([InlineKeyboard.text(`Видалити ${icon}${el.plate}`, `delete:${el.plate}`)])
