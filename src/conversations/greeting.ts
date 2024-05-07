@@ -28,8 +28,7 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
 
             const statusMessage = await ctx.reply("Звіряємо дані...");
             const response = await conversation.external(async () => await getVehicles(ctx, {
-                phones: contactReply.message.contact.phone_number,
-                type: 2
+                phones: contactReply.message.contact.phone_number
             }))
 
             try {
