@@ -5,7 +5,7 @@ import {backToStart} from "../helpers/menu";
 // @ts-ignore
 import {getBuildingName} from 'nivkipark/src/helpers/buildings'
 import {handleException} from "../helpers/errors";
-import {getVehicles} from "../helpers/api";
+import {getUsers} from "../helpers/api";
 
 const bot = new Composer<MyContext>();
 
@@ -27,8 +27,8 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
             contactReply.message.contact.phone_number = contactReply.message?.contact.phone_number.replace('+', '').replace('-', '')
 
             const statusMessage = await ctx.reply("Звіряємо дані...");
-            const response = await conversation.external(async () => await getVehicles(ctx, {
-                phones: contactReply.message.contact.phone_number
+            const response = await conversation.external(async () => await getUsers(ctx, {
+                phone: contactReply.message.contact.phone_number
             }))
 
             try {

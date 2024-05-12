@@ -25,6 +25,17 @@ export async function getVehicles(ctx: MyContext, data: {}) {
     return response
 }
 
+export async function getUsers(ctx: MyContext, data: {}) {
+    const string = new URLSearchParams(data).toString()
+    const response: [object] = await fetch(`${getApiBase(ctx)}/api/users?${string}`, {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+        }
+    }).then(response => response.json())
+    return response
+}
+
 export async function getRequests(ctx: MyContext, data: {}) {
     const string = new URLSearchParams(data).toString()
     const response: [object] = await fetch(`${getApiBase(ctx)}/api/requests?${string}`, {
