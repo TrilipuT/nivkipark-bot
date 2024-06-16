@@ -11,6 +11,7 @@ import {Composer} from "grammy";
 import {isAdmin} from "../helpers/auth";
 import {addUser, getUsers} from "../helpers/api";
 import {askBuilding, askFlat} from "../helpers/questions";
+import {sanitizePhone} from "nivkipark/src/helpers/sanitize"
 
 const bot = new Composer<MyContext>();
 
@@ -25,15 +26,17 @@ async function newUser(conversation: Conversation<any>, ctx: MyContext) {
 
         // @ts-ignore
         const phoneReply = await conversation.waitFor('message:text')
+        const phone = sanitizePhone(phoneReply.message.text)
+
         const re = new RegExp('^\\+?380\\d{9}$')
-        if (!re.test(phoneReply.message.text)) {
+        if (!re.test(phone)) {
             if (phoneReply.message.text != MENU_CANCEL) {
                 await ctx.reply("Помилка в номері.\n<em>Без пробілів і спецзнаків.</em>\n<em>Використовуйте повний формат</em> <code>380ХХХХХХХХХ</code>", {parse_mode: 'HTML'})
             }
             await conversation.skip()
         }
 
-        data.phone = phoneReply.message.text
+        data.phone = phone
         const users = await getUsers(ctx, data)
         await conversation.sleep(1000)
         if (users.length) {
