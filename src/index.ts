@@ -24,9 +24,10 @@ import greeting from "./conversations/greeting";
 import requests from "./conversations/request";
 import myVehicles from "./conversations/myVehicles";
 import auth from "./helpers/auth";
-import {backToStart, MENU_CANCEL, MENU_MY_VEHICLES, MENU_REQUESTS_LIST, MENU_REQUESTS_NEW,} from "./helpers/menu";
+import {backToStart, MENU_CANCEL} from "./helpers/menu";
 import {isAuthenticated} from "./helpers/auth";
 import {Toucan} from "toucan-js";
+import addUser from "./conversations/newUser";
 
 export interface Env {
     TOKEN: string
@@ -104,6 +105,7 @@ export default {
             bot.use(greeting)
             bot.use(requests)
             bot.use(myVehicles)
+            bot.use(addUser)
             bot.use(auth)
 
 

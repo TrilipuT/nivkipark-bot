@@ -13,16 +13,17 @@
     "starttunnel": "cloudflared tunnel --url http://localhost:8787",
     "registerhook": "curl https://api.telegram.org/bot6751459282:AAHSE2JQn6x-PFS9JQ9_K45ZSmbi5uOTV8k/setWebhook?url=https://hon-sir-opinion-seems.trycloudflare.com",
     "deploy": "wrangler deploy --outdir dist && pnpm sentry:sourcemaps",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org nivki-park --project bot ./dist && sentry-cli sourcemaps upload --org nivki-park --project bot ./dist"
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org nivki-park --project bot ./dist && sentry-cli sourcemaps upload --org nivki-park --project bot ./dist",
+    "postinstall": "pnpm update nivkipark"
   },
   "dependencies": {
     "@grammyjs/hydrate": "^1.4.1",
     "@grammyjs/storage-cloudflare": "^2.4.2",
     "@ponomarevlad/grammyjs-conversations": "^1.1.2-web.1",
-    "@sentry/cli": "^2.31.0",
+    "@sentry/cli": "^2.32.1",
     "callback-data": "^1.1.1",
-    "grammy": "^1.21.1",
+    "grammy": "^1.24.1",
     "nivkipark": "github:TrilipuT/nivkipark",
-    "toucan-js": "^3.3.1"
+    "toucan-js": "^3.4.0"
   }
 }

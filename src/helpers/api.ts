@@ -36,6 +36,16 @@ export async function getUsers(ctx: MyContext, data: {}) {
     return response
 }
 
+export async function addUser(ctx: MyContext, data: {}) {
+    return await fetch(`${getApiBase(ctx)}/api/users`, {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data)
+    })
+}
+
 export async function getRequests(ctx: MyContext, data: {}) {
     const string = new URLSearchParams(data).toString()
     const response: [object] = await fetch(`${getApiBase(ctx)}/api/requests?${string}`, {

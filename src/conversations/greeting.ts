@@ -1,11 +1,11 @@
 import {Conversation, createConversation} from "@ponomarevlad/grammyjs-conversations";
 import type {MyContext} from "../index";
-import {Composer, InlineKeyboard, Keyboard} from "grammy";
+import {Composer, Keyboard} from "grammy";
 import {backToStart} from "../helpers/menu";
 // @ts-ignore
-import {getBuildingName} from 'nivkipark/src/helpers/buildings'
 import {handleException} from "../helpers/errors";
 import {getUsers} from "../helpers/api";
+import {askBuilding, askFlat} from "../helpers/questions";
 
 const bot = new Composer<MyContext>();
 
@@ -49,49 +49,17 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
             }
         }
         // ========= End ask for contact =========
-
-
-        const keyboard = new InlineKeyboard()
-            .text(getBuildingName('b1'), 'b1')
-            .text(getBuildingName('b2'), 'b2')
-            .text(getBuildingName('b3'), 'b3').row()
-            .text(getBuildingName('b4'), 'b4')
-            .text(getBuildingName('b5'), 'b5')
-            .text(getBuildingName('b6'), 'b6').row()
-            // школа 65Г
-            .text(getBuildingName('b7'), 'b7')
-            .text(getBuildingName('b8'), 'b8')
-            // .text('1A (9)','b9')
-            // .text('1Б (10)','b10')
-            .text(getBuildingName('b11'), 'b11').row()
-            .text(getBuildingName('b12'), 'b12')
-
-        // ========= Ask for building =========
-        await ctx.reply(`Приємно познайомитись, ${contactReply.message?.contact?.first_name}!\nВкажіть в якому будинку ви мешкаєте:`, {
-            reply_markup: keyboard
-        });
-        const buildingReply = await conversation.waitFor("callback_query:data", {
-            otherwise: async (ctx) => {
-                await ctx.reply(`Оберіть один з варіантів натиснувши на копку вище 👆`)
-            }
-        });
-        await buildingReply.answerCallbackQuery({text: 'Дякую!'})
-        if (buildingReply.update.callback_query.data) {
-            conversation.session.building = buildingReply.update.callback_query.data
-        }
-
+        const building = await askBuilding(
+            ctx,
+            conversation,
+            `Приємно познайомитись, ${contactReply.message?.contact?.first_name}!\nВкажіть в якому будинку ви мешкаєте:`
+        )
+        conversation.session.building = building
         // ========= End ask for building =========
 
         // ========= Ask for flat =========
-        await ctx.reply(`Вкажіть вашу квартиру:`, {
-            reply_markup: {remove_keyboard: true},
-        })
-        const flatReply = await conversation.waitFor('message:text', {
-            otherwise: async (ctx) => {
-                await ctx.reply(`Не зрозумів нічого... \nВведіть номер квартири, приміщення чи назву комерції.`)
-            }
-        });
-        conversation.session.flat = flatReply.message.text
+        const flat = await askFlat(ctx, conversation, `Вкажіть вашу квартиру:`)
+        conversation.session.flat = flat
         // ========= End ask for flat =========
 
         await backToStart(ctx, `Супер, дякую за авторизацію. Перейдемо до справи.`)

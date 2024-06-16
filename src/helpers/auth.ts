@@ -18,7 +18,27 @@ const blocked = {
     "b12": [],
 }
 
+const admins = [
+    '380966964221', // 1 Таня
+    '380639111075', // 1 Паша
+    '380986440039', // 1 Альона
+    '380503304033', // 1 🅨🅔🅥
+    '380953962888', // 2 Таня
+    '380939543331', // 3 Настя
+    '380963720485', // 3 Юля
+    '380638645550', // 3 Діма
+    '380632521709', // 4 me
+    '380503860369', // 4 Іра
+    '380675572500', // 5 Наталя
+    '380957447405', // 6 катя
+]
+
 const bot = new Composer<MyContext>();
+
+export async function isAdmin(ctx: MyContext) {
+    await ctx.session
+    return ctx.session.contact.phone_number && admins.includes(ctx.session.contact.phone_number)
+}
 
 export async function isAuthenticated(ctx: MyContext) {
     await ctx.session
