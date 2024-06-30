@@ -79,7 +79,7 @@ export async function isUserInDB(ctx: MyContext, contact: InlineQueryResultConta
  */
 export async function isUserInChat(ctx: MyContext, contact: InlineQueryResultContact) {
     const result = await ctx.api.getChatMember(chatId, contact.user_id);
-    return result.status == 'member';
+    return ["creator", "administrator", "member", "restricted"].includes(result.status);
 }
 
 bot.command("auth", async (ctx) => {

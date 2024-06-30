@@ -66,8 +66,8 @@ export default {
             };
             await next();
         });
+        bot.use(hydrate());
         try {
-            bot.use(hydrate());
             bot.use(lazySession({
                 storage: new KvAdapter<SessionData>(env.KV),
                 initial: () => ({

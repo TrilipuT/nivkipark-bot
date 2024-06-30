@@ -27,13 +27,12 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
         let isInDB = false;
         if (contactReply.message?.contact) {
             // set contact into format without + and -
-            contactReply.message.contact.phone_number = contactReply.message?.contact.phone_number.replace('+', '').replace('-', '')
+            contactReply.message.contact.phone_number = contactReply.message.contact.phone_number.replace('+', '').replace('-', '')
 
             const statusMessage = await ctx.reply("Звіряємо дані...");
             isInDB = await conversation.external(async () => await isUserInDB(ctx, contactReply.message.contact))
             if (!isInDB) {
-                isInChat = await conversation.external(async () => await isUserInChat(ctx, contactReply.message.contact))
-                isInChat = true
+                isInChat = await isUserInChat(ctx, contactReply.message.contact)
             }
 
             try {
@@ -41,7 +40,6 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
                 await statusMessage.editText("Зроблено.")
                 await conversation.sleep(1000)
             } catch (e) {
-
             }
             // await statusMessage.delete().catch(() => {})
             conversation.session.contact = contactReply.message.contact;
