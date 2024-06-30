@@ -4,8 +4,9 @@ import {Composer, Keyboard} from "grammy";
 import {backToStart} from "../helpers/menu";
 // @ts-ignore
 import {handleException} from "../helpers/errors";
-import {getUsers} from "../helpers/api";
+import {addUser} from "../helpers/api";
 import {askBuilding, askFlat} from "../helpers/questions";
+import {isUserInChat, isUserInDB} from "../helpers/auth";
 
 const bot = new Composer<MyContext>();
 
@@ -22,14 +23,18 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
             }
         });
         // ========= Check for contact =========
+        let isInChat = false;
+        let isInDB = false;
         if (contactReply.message?.contact) {
             // set contact into format without + and -
             contactReply.message.contact.phone_number = contactReply.message?.contact.phone_number.replace('+', '').replace('-', '')
 
             const statusMessage = await ctx.reply("Звіряємо дані...");
-            const response = await conversation.external(async () => await getUsers(ctx, {
-                phone: contactReply.message.contact.phone_number
-            }))
+            isInDB = await conversation.external(async () => await isUserInDB(ctx, contactReply.message.contact))
+            if (!isInDB) {
+                isInChat = await conversation.external(async () => await isUserInChat(ctx, contactReply.message.contact))
+                isInChat = true
+            }
 
             try {
                 await conversation.sleep(1000)
@@ -40,8 +45,7 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
             }
             // await statusMessage.delete().catch(() => {})
             conversation.session.contact = contactReply.message.contact;
-
-            if (!response?.length) {
+            if (!isInDB && !isInChat) {
                 await ctx.reply(`Вибачте, ваш номер телефону не верифіковано. Для користування ботом звяжіться з представником ОСББ вашого будинку.\nПісля цього натисніть /start нижче.`, {
                     reply_markup: new Keyboard().text('/start').resized().oneTime()
                 })
@@ -61,6 +65,13 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
         const flat = await askFlat(ctx, conversation, `Вкажіть вашу квартиру:`)
         conversation.session.flat = flat
         // ========= End ask for flat =========
+        if (isInChat && !isInDB) {
+            await addUser(ctx, {
+                phone: conversation.session.contact.phone_number,
+                building: building,
+                flat: flat
+            })
+        }
 
         await backToStart(ctx, `Супер, дякую за авторизацію. Перейдемо до справи.`)
         return

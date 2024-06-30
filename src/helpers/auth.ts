@@ -1,6 +1,7 @@
 import {Composer, Keyboard} from "grammy";
 import {MyContext} from "../index";
 import {backToStart} from "./menu";
+import {getUsers} from "./api";
 
 // updated as of 06 June
 const blocked = {
@@ -17,6 +18,9 @@ const blocked = {
     "b11": [],
     "b12": [],
 }
+
+// Owners chat id
+const chatId = -1001438308653;
 
 const admins = [
     '380966964221', // 1 Таня
@@ -56,6 +60,26 @@ export async function isAuthenticated(ctx: MyContext) {
         await backToStart(ctx, '❗️Користування ботом обмежено.❗️\nПеревірте наявність заборгованості перед ОСББ/ЖЕК.\nПісля сплати заборгованності надішліть квитанцію про оплату @dm_domolad або @domoladbot і доступ буде відновлено якнайшвидше. ')
     }
     return allow
+}
+
+/**
+ * Check user in DB
+ * @param ctx
+ * @param contact
+ */
+export async function isUserInDB(ctx: MyContext, contact: InlineQueryResultContact) {
+    const users = await getUsers(ctx, {phone: contact.phone_number})
+    return !!users.length
+}
+
+/** Check user from Chat
+ *
+ * @param ctx
+ * @param contact
+ */
+export async function isUserInChat(ctx: MyContext, contact: InlineQueryResultContact) {
+    const result = await ctx.api.getChatMember(chatId, contact.user_id);
+    return result.status == 'member';
 }
 
 bot.command("auth", async (ctx) => {
