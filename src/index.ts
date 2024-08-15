@@ -61,7 +61,7 @@ export default {
         const bot = new Bot<MyContext>(env.TOKEN)
         bot.use(async (ctx, next) => {
             ctx.config = {
-                env: env?.ENVIRONMENT ?? '',
+                env: env?.ENVIRONMENT ?? 'production',
                 dsn: env.SENTRY_DSN,
             };
             await next();
