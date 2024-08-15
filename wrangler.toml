@@ -5,7 +5,7 @@ compatibility_date = "2024-01-29"
 
 [vars]
 #TOKEN is added via Cloudflare encoded vars
-ENVIRONMENT=production
+ENVIRONMENT = "production"
 SECRET_PATH = "registerWebhook"
 SENTRY_DSN = "https://97f73137bcf70a67a29908a7112df84d@o4506937589891072.ingest.us.sentry.io/4506937593364480"
 
