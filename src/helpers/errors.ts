@@ -5,7 +5,7 @@ import {Toucan} from "toucan-js";
 export async function handleException(e: any, ctx: MyContext) {
     await ctx.session
     const sentry = new Toucan({
-        environment: ctx.config.env ?? 'production',
+        environment: ctx.config?.env ?? 'production',
         dsn: ctx.config.dsn,
         ctx
     });

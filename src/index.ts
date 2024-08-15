@@ -58,7 +58,9 @@ export default {
         ctx: ExecutionContext
     ): Promise<Response> {
 
-        const bot = new Bot<MyContext>(env.TOKEN)
+        const mainBot = new Bot<MyContext>(env.TOKEN)
+        const bot = mainBot.chatType("private")
+
         bot.use(async (ctx, next) => {
             ctx.config = {
                 env: env?.ENVIRONMENT ?? 'production',
@@ -145,6 +147,6 @@ export default {
             });
             sentry.captureException(e);
         }
-        return webhookCallback(bot, "cloudflare-mod")(request)
+        return webhookCallback(mainBot, "cloudflare-mod")(request)
     },
 };
