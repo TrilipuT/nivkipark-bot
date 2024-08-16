@@ -6,7 +6,7 @@ export async function handleException(e: any, ctx: MyContext) {
     await ctx.session
     const sentry = new Toucan({
         environment: ctx.config?.env ?? 'production',
-        dsn: ctx.config.dsn,
+        dsn: 'https://97f73137bcf70a67a29908a7112df84d@o4506937589891072.ingest.us.sentry.io/4506937593364480',
         ctx
     });
 
