@@ -1,6 +1,6 @@
 name = "nivkipark-bot"
 main = "src/index.ts"
-compatibility_date = "2024-01-29"
+compatibility_date = "2024-09-23"
 #compatibility_flags = [ "nodejs_compat" ]
 
 [vars]
@@ -8,6 +8,10 @@ compatibility_date = "2024-01-29"
 ENVIRONMENT = "production"
 SECRET_PATH = "registerWebhook"
 SENTRY_DSN = "https://97f73137bcf70a67a29908a7112df84d@o4506937589891072.ingest.us.sentry.io/4506937593364480"
+
+[observability]
+enabled = true
+head_sampling_rate = 1
 
 [[kv_namespaces]]
 binding = "KV"

@@ -18,17 +18,14 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
             reply_markup: cancelKeyboard,
             parse_mode: 'HTML'
         })
-        // @ts-ignore
-        const plateReply = await conversation.waitFor('message:text')
-        const re = new RegExp('^[a-zA-Zа-яґєіїА-ЯҐЄІЇ0-9]*$')
-        if (!re.test(plateReply.message.text)) {
-            if (plateReply.message.text != MENU_CANCEL) {
-                await ctx.reply("Помилка в номері.\n<em>Без пробілів і спецзнаків. Тільки букви і цифри.</em>", {parse_mode: 'HTML'})
+        const plateReply = await conversation.waitForHears(/^[a-zA-Zа-яґєіїА-ЯҐЄІЇ0-9]*$/, {
+            otherwise: async (ctx) => {
+                if (ctx.msg.text != MENU_CANCEL) {
+                    await ctx.reply("Помилка в номері.\n<em>Без пробілів і спецзнаків. Тільки букви і цифри.</em>", {parse_mode: 'HTML'})
+                }
             }
-            await conversation.skip()
-        }
-
-        const plate = plateReply.message.text.toUpperCase()
+        })
+        const plate = (plateReply.msg.text ?? plateReply.msg.caption).toUpperCase()
         const now = await conversation.now()
         const date_added = new Date(now)
         const date_expire = new Date(now)

@@ -25,14 +25,14 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
         // ========= Check for contact =========
         let isInChat = false;
         let isInDB = false;
-        if (contactReply.message?.contact) {
+        if (contactReply.msg?.contact) {
             // set contact into format without + and -
-            contactReply.message.contact.phone_number = contactReply.message.contact.phone_number.replace('+', '').replace('-', '')
+            contactReply.msg.contact.phone_number = contactReply.msg.contact.phone_number.replace('+', '').replace('-', '')
 
             const statusMessage = await ctx.reply("Звіряємо дані...");
-            isInDB = await conversation.external(async () => await isUserInDB(ctx, contactReply.message.contact))
+            isInDB = await conversation.external(async () => await isUserInDB(ctx, contactReply.msg.contact))
             if (!isInDB) {
-                isInChat = await isUserInChat(ctx, contactReply.message.contact)
+                isInChat = await isUserInChat(ctx, contactReply.msg.contact)
             }
 
             try {
@@ -42,7 +42,7 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
             } catch (e) {
             }
             // await statusMessage.delete().catch(() => {})
-            conversation.session.contact = contactReply.message.contact;
+            conversation.session.contact = contactReply.msg.contact;
             if (!isInDB && !isInChat) {
                 await ctx.reply(`Вибачте, ваш номер телефону не верифіковано. Для користування ботом звяжіться з представником ОСББ вашого будинку.\nПісля цього натисніть /start нижче.`, {
                     reply_markup: new Keyboard().text('/start').resized().oneTime()
@@ -54,7 +54,7 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
         const building = await askBuilding(
             ctx,
             conversation,
-            `Приємно познайомитись, ${contactReply.message?.contact?.first_name}!\nВкажіть в якому будинку ви мешкаєте:`
+            `Приємно познайомитись, ${contactReply.msg?.contact?.first_name}!\nВкажіть в якому будинку ви мешкаєте:`
         )
         conversation.session.building = building
         // ========= End ask for building =========
