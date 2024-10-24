@@ -14,7 +14,7 @@
     "registerhook": "curl https://api.telegram.org/bot6751459282:AAHSE2JQn6x-PFS9JQ9_K45ZSmbi5uOTV8k/setWebhook?url=https://hon-sir-opinion-seems.trycloudflare.com",
     "deploy": "wrangler deploy --outdir dist && pnpm sentry:sourcemaps",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org nivki-park --project bot ./dist && sentry-cli sourcemaps upload --org nivki-park --project bot ./dist",
-    "postinstall": "pnpm update nivkipark"
+    "epostinstall": "pnpm update nivkipark"
   },
   "dependencies": {
     "@grammyjs/hydrate": "^1.4.1",
@@ -23,7 +23,7 @@
     "@sentry/cli": "^2.38.0",
     "callback-data": "^1.1.1",
     "grammy": "^1.30.0",
-    "nivkipark": "github:TrilipuT/nivkipark",
+    "nivkipark": "git+ssh://git@github.com:TrilipuT/nivkipark.git#main",
     "toucan-js": "^4.0.0"
   }
 }

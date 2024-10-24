@@ -3,6 +3,15 @@ main = "src/index.ts"
 compatibility_date = "2024-09-23"
 #compatibility_flags = [ "nodejs_compat" ]
 
+kv_namespaces = [
+  { binding = "KV", id = "677d50fb1f64487ab6b944e487c0aa72" }
+]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "nivkipark-bot"
+database_id = "37de37f7-aee7-4ec5-8010-589dccafabbf"
+
 [vars]
 #TOKEN is added via Cloudflare encoded vars
 ENVIRONMENT = "production"
@@ -12,7 +21,3 @@ SENTRY_DSN = "https://97f73137bcf70a67a29908a7112df84d@o4506937589891072.ingest.
 [observability]
 enabled = true
 head_sampling_rate = 1
-
-[[kv_namespaces]]
-binding = "KV"
-id = "677d50fb1f64487ab6b944e487c0aa72"

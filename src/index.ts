@@ -18,7 +18,7 @@ import {
     type ConversationFlavor,
     conversations,
 } from "@ponomarevlad/grammyjs-conversations";
-import {KvAdapter} from '@grammyjs/storage-cloudflare';
+import {D1Adapter} from '@grammyjs/storage-cloudflare';
 import {hydrate, HydrateFlavor} from "@grammyjs/hydrate";
 import greeting from "./conversations/greeting";
 import requests from "./conversations/request";
@@ -32,6 +32,7 @@ import addUser from "./conversations/newUser";
 export interface Env {
     TOKEN: string
     KV: KVNamespace<string>
+    DB: D1Database
     ENVIRONMENT: string
     SENTRY_DSN: string
 }
@@ -60,7 +61,6 @@ export default {
 
         const mainBot = new Bot<MyContext>(env.TOKEN)
         const bot = mainBot.chatType("private")
-
         bot.use(async (ctx, next) => {
             ctx.config = {
                 env: env?.ENVIRONMENT ?? 'production',
@@ -70,8 +70,10 @@ export default {
         });
         bot.use(hydrate());
         try {
+            const grammyD1StorageAdapter = await D1Adapter.create<SessionData>(env.DB, 'GrammySessions')
+
             bot.use(lazySession({
-                storage: new KvAdapter<SessionData>(env.KV),
+                storage: grammyD1StorageAdapter,
                 initial: () => ({
                     contact: {
                         phone_number: '',
@@ -95,6 +97,7 @@ export default {
 
             })*/
             bot.use(async (ctx, next) => {
+                await ctx.replyWithChatAction('typing')
                 if (ctx.config?.env != 'development') {
                     console.log(ctx.message)
                 }

@@ -25,6 +25,7 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
                 }
             }
         })
+
         const plate = (plateReply.msg.text ?? plateReply.msg.caption).toUpperCase()
         const now = await conversation.now()
         const date_added = new Date(now)
@@ -50,6 +51,7 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
 
         await backToStart(ctx, message)
     } catch (e: any) {
+        console.error(e)
         await handleException(e, ctx)
     }
 }
