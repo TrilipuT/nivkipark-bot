@@ -39,6 +39,7 @@ bot.filter(ctx => ctx.msg?.text == MENU_MY_VEHICLES,
                     parse_mode: 'HTML'
                 })
 
+                console.log('my vehicles')
 
                 await backToStart(ctx)
             } catch (e: any) {

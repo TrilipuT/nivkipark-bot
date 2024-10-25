@@ -70,6 +70,7 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
                 flat: flat
             })
         }
+        console.log('auth done')
 
         await backToStart(ctx, `Супер, дякую за авторизацію. Перейдемо до справи.`)
         return

@@ -97,7 +97,7 @@ export default {
 
             })*/
             bot.use(async (ctx, next) => {
-                await ctx.replyWithChatAction('typing')
+                // await ctx.replyWithChatAction('typing')
                 if (ctx.config?.env != 'development') {
                     console.log(ctx.message)
                 }
@@ -115,12 +115,14 @@ export default {
 
 
             bot.command("cancel", async (ctx) => {
+                console.log('cancel')
                 await ctx.conversation.exit()
                 await backToStart(ctx)
             })
 
             bot.command("start", async (ctx) => {
                 await ctx.session
+                console.log('start')
                 // @ts-ignore
                 if (ctx.session.contact?.phone_number && ctx.session.building && ctx.session.flat) {
                     await backToStart(ctx)
@@ -133,6 +135,7 @@ export default {
             bot.filter(ctx => ctx.msg?.text == MENU_CANCEL,
                 async (ctx, next) => {
                     // Cancel
+                    console.log('menu cancel')
                     await ctx.conversation.exit()
                     await ctx.reply('Ок, відміняємо.')
                     if (await isAuthenticated(ctx)) {

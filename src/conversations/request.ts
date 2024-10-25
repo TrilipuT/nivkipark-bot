@@ -49,6 +49,8 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
             message = 'Вибачте, сталась помилка. Спробуйте надіслати заявку пізніше.'
         }
 
+        console.log('request new done')
+
         await backToStart(ctx, message)
     } catch (e: any) {
         console.error(e)
@@ -79,6 +81,8 @@ async function list(ctx: MyContext) {
             result = 'Нічого не знайдено'
         }
 
+        console.log('request list')
+
         await ctx.reply(result, {
             reply_markup: InlineKeyboard.from(buttons).toFlowed(1),
             parse_mode: 'HTML'
@@ -100,6 +104,7 @@ bot.callbackQuery(
         if (result.ok) {
             ctx.answerCallbackQuery()
             await ctx.reply('Видалено!')
+            console.log('request deleted')
             await list(ctx)
         } else {
             backToStart(ctx, 'От лажа, щось пішло не так...')

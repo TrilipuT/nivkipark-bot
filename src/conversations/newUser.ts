@@ -60,6 +60,8 @@ async function newUser(conversation: Conversation<any>, ctx: MyContext) {
             message = 'Вибачте, сталась помилка. Спробуйте надіслати заявку пізніше.'
         }
 
+        console.log('user added')
+
         await backToStart(ctx, message)
     } catch (e: any) {
         await handleException(e, ctx)
