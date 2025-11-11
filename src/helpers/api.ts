@@ -1,7 +1,7 @@
 import {MyContext} from "../index";
 
 function getApiBase(ctx: MyContext): String {
-    return ctx.config?.env == 'development' ? 'http://localhost:8788' : 'https://nivkipark.pages.dev'
+    return ctx.config?.env == 'development' ? 'http://localhost:3000' : 'https://nivkipark.org'
 }
 
 export async function addVehicle(ctx: MyContext, data: {}) {
@@ -31,7 +31,7 @@ export async function getUsers(ctx: MyContext, data: {}) {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
-        }
+        },
     }).then(response => response.json())
     return response
 }
@@ -68,10 +68,11 @@ export async function addRequest(ctx: MyContext, data: {}) {
 }
 
 export async function deleteRequest(ctx: MyContext, id: Number) {
-    return await fetch(`${getApiBase(ctx)}/api/requests?id=${id}`, {
+    return await fetch(`${getApiBase(ctx)}/api/requests`, {
         method: 'DELETE',
         headers: {
             "Content-Type": "application/json",
-        }
+        },
+        body: JSON.stringify({id: id}),
     })
 }

@@ -1,20 +1,21 @@
 {
   "name": "nivkipark-bot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241022.0",
-    "typescript": "^5.5.2",
+    "@cloudflare/workers-types": "^4.20251004.0",
+    "typescript": "^5.9.2",
     "wrangler": "3.82.0"
   },
   "platform": "node",
   "private": true,
   "scripts": {
+    "prestart": "cloudflared service install eyJhIjoiY2ZjMGNkMWY2ZWEzODVkNGU1NTEwNGFiOTMwYzNkYmQiLCJ0IjoiZGJiYzRlNTgtMDcxMi00YjAwLWE3NTAtYmIxZThkODE5ZDc5IiwicyI6Ik16SmhOV0UzWWpFdE1EUmhOeTAwWXpGaUxUazVOakF0T0dGa1lUY3pOVFJtTUdOaSJ9",
     "start": "wrangler dev",
-    "starttunnel": "cloudflared tunnel --url http://localhost:8787",
+    "poststart": "cloudflared service uninstall eyJhIjoiY2ZjMGNkMWY2ZWEzODVkNGU1NTEwNGFiOTMwYzNkYmQiLCJ0IjoiZGJiYzRlNTgtMDcxMi00YjAwLWE3NTAtYmIxZThkODE5ZDc5IiwicyI6Ik16SmhOV0UzWWpFdE1EUmhOeTAwWXpGaUxUazVOakF0T0dGa1lUY3pOVFJtTUdOaSJ9",
     "registerhook": "curl https://api.telegram.org/bot6751459282:AAHSE2JQn6x-PFS9JQ9_K45ZSmbi5uOTV8k/setWebhook?url=https://hon-sir-opinion-seems.trycloudflare.com",
     "deploy": "wrangler deploy --outdir dist && pnpm sentry:sourcemaps",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org nivki-park --project bot ./dist && sentry-cli sourcemaps upload --org nivki-park --project bot ./dist",
-    "epostinstall": "pnpm update nivkipark"
+    "postinstall": "pnpm update nivkipark"
   },
   "dependencies": {
     "@grammyjs/hydrate": "^1.4.1",

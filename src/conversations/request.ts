@@ -8,6 +8,7 @@ import type {InlineKeyboardButton} from "grammy/out/types";
 import {createCallbackData} from "callback-data";
 import {addRequest, deleteRequest, getRequests} from "../helpers/api";
 import {LocalDate} from '../helpers/date'
+import {getBuildingName} from "nivkipark/src/helpers/buildings";
 
 const bot = new Composer<MyContext>();
 const requestData = createCallbackData('request', {id: Number})
@@ -35,12 +36,10 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
 
         let data = {
             'plate': plate,
-            'building': conversation.session.building,
-            'flat': conversation.session.flat,
-            'type': 1,
+            'address': getBuildingName(conversation.session.building) + ', ' + conversation.session.flat,
             'phone': conversation.session.contact.phone_number,
-            'date_added': date_added.toISOString(),
-            'date_expire': date_expire.toISOString(),
+            // 'created_at': date_added.toISOString(),
+            'expire_at': date_expire.toISOString(),
         }
 
         const result = await addRequest(ctx, data)
@@ -67,11 +66,10 @@ async function list(ctx: MyContext) {
 
         let result = ''
         let buttons: InlineKeyboardButton[][] = []
-
-        if (response?.length) {
+        if (response?.count) {
             let replies: string[] = []
-            response.forEach((el, index) => {
-                let date_expire = LocalDate.parse(el.expireAt)
+            response.data.forEach((el, index) => {
+                let date_expire = LocalDate.parse(el.expire_at)
                 let icon = ['🚘', '🚖'][index % 2]
                 replies.push(`${icon} <u>${el.plate}</u> - діє до <code>${date_expire.toLocaleString()}</code>`)
                 buttons.push([InlineKeyboard.text(`Видалити ${icon}${el.plate}`, requestData.pack({id: el.id}))])
