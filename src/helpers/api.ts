@@ -9,6 +9,8 @@ export async function addVehicle(ctx: MyContext, data: {}) {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
+            "Log-Author": ctx.session.contact.phone_number,
+            "Log-Source": 'bot',
         },
         body: JSON.stringify(data)
     })
@@ -41,6 +43,8 @@ export async function addUser(ctx: MyContext, data: {}) {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
+            "Log-Author": ctx.session.contact.phone_number,
+            "Log-Source": 'bot',
         },
         body: JSON.stringify(data)
     })
@@ -62,6 +66,8 @@ export async function addRequest(ctx: MyContext, data: {}) {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
+            "Log-Author": ctx.session.contact.phone_number,
+            "Log-Source": 'bot',
         },
         body: JSON.stringify(data)
     })
@@ -72,6 +78,8 @@ export async function deleteRequest(ctx: MyContext, id: Number) {
         method: 'DELETE',
         headers: {
             "Content-Type": "application/json",
+            "Log-Author": ctx.session.contact.phone_number,
+            "Log-Source": 'bot',
         },
         body: JSON.stringify({id: id}),
     })
