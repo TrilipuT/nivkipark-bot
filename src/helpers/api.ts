@@ -5,6 +5,7 @@ function getApiBase(ctx: MyContext): String {
 }
 
 export async function addVehicle(ctx: MyContext, data: {}) {
+    await ctx.session
     return await fetch(`${getApiBase(ctx)}/api/vehicles`, {
         method: 'POST',
         headers: {
@@ -39,6 +40,7 @@ export async function getUsers(ctx: MyContext, data: {}) {
 }
 
 export async function addUser(ctx: MyContext, data: {}) {
+    await ctx.session
     return await fetch(`${getApiBase(ctx)}/api/users`, {
         method: 'POST',
         headers: {
@@ -62,6 +64,7 @@ export async function getRequests(ctx: MyContext, data: {}) {
 }
 
 export async function addRequest(ctx: MyContext, data: {}) {
+    await ctx.session
     return await fetch(`${getApiBase(ctx)}/api/requests`, {
         method: 'POST',
         headers: {
@@ -74,6 +77,7 @@ export async function addRequest(ctx: MyContext, data: {}) {
 }
 
 export async function deleteRequest(ctx: MyContext, id: Number) {
+    await ctx.session
     return await fetch(`${getApiBase(ctx)}/api/requests`, {
         method: 'DELETE',
         headers: {
