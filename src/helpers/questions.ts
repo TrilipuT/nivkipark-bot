@@ -43,3 +43,21 @@ export async function askFlat(ctx: MyContext, conversation: Conversation<any>, q
     });
     return flatReply.message.text
 }
+
+export async function askType(ctx: MyContext, conversation: Conversation<any>, question: string) {
+    const keyboard = new InlineKeyboard()
+        .text('Власник', 'OWNER')
+        .text('Орендар', 'TENANT')
+
+    // ========= Ask for building =========
+    await ctx.reply(question, {
+        reply_markup: keyboard
+    });
+    const buildingReply = await conversation.waitFor("callback_query:data", {
+        otherwise: async (ctx) => {
+            await ctx.reply(`Оберіть один з варіантів натиснувши на копку вище 👆`)
+        }
+    });
+    await buildingReply.answerCallbackQuery({text: 'Дякую!'})
+    return buildingReply.update.callback_query.data
+}

@@ -10,7 +10,7 @@ import {handleException} from "../helpers/errors";
 import {Composer} from "grammy";
 import {isAdmin} from "../helpers/auth";
 import {addUser, getUsers} from "../helpers/api";
-import {askBuilding, askFlat} from "../helpers/questions";
+import {askBuilding, askFlat, askType} from "../helpers/questions";
 import {sanitizePhone} from "nivkipark/src/helpers/sanitize"
 
 const bot = new Composer<MyContext>();
@@ -52,6 +52,10 @@ async function newUser(conversation: Conversation<any>, ctx: MyContext) {
         )
         // ========= Ask for flat =========
         data.flat = await askFlat(ctx, conversation, `Вкажіть квартиру:`)
+        // ========= End ask for flat =========
+
+        // ========= Ask for flat =========
+        data.type = await askType(ctx, conversation, `Тип користувача:`)
         // ========= End ask for flat =========
 
         const result = await addUser(ctx, data)

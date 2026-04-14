@@ -18,7 +18,7 @@ bot.filter(ctx => ctx.msg?.text == MENU_MY_VEHICLES,
         if (await isAuthenticated(ctx)) {
             try {
                 await ctx.session
-                const response = await getVehicles(ctx, {phones: ctx.session.contact.phone_number})
+                const response = await getVehicles(ctx, {phone: ctx.session.contact.phone_number})
                 let result = ''
                 let buttons: InlineKeyboardButton[][] = []
                 if (response?.count) {

@@ -9,6 +9,7 @@ import {createCallbackData} from "callback-data";
 import {addRequest, deleteRequest, getRequests} from "../helpers/api";
 import {LocalDate} from '../helpers/date'
 import {getBuildingName} from "nivkipark/src/helpers/buildings";
+import {sanitizePlate} from "../helpers/sanitize";
 
 const bot = new Composer<MyContext>();
 const requestData = createCallbackData('request', {id: Number})
@@ -19,15 +20,15 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
             reply_markup: cancelKeyboard,
             parse_mode: 'HTML'
         })
-        const plateReply = await conversation.waitForHears(/^[a-zA-Zа-яґєіїА-ЯҐЄІЇ0-9]*$/, {
+        const plateReply = await conversation.waitForHears(/^[А-ЩЬЮЯҐЄІЇA-Z]{2}[0-9]{4}[А-ЩЬЮЯҐЄІЇA-Z]{2}$/i, {
             otherwise: async (ctx) => {
                 if (ctx.msg.text != MENU_CANCEL) {
-                    await ctx.reply("Помилка в номері.\n<em>Без пробілів і спецзнаків. Тільки букви і цифри.</em>", {parse_mode: 'HTML'})
+                    await ctx.reply("Помилка в номері.\n<em>Без пробілів і спецзнаків. Тільки букви і цифри. Формат - саме <code>ХХ0000ХХ</code></em>", {parse_mode: 'HTML'})
                 }
             }
         })
 
-        const plate = (plateReply.msg.text ?? plateReply.msg.caption).toUpperCase()
+        const plate = sanitizePlate(plateReply.msg.text ?? plateReply.msg.caption)
         const now = await conversation.now()
         const date_added = new Date(now)
         const date_expire = new Date(now)
