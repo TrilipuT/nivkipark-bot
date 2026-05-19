@@ -69,7 +69,7 @@ async function list(ctx: MyContext) {
         let buttons: InlineKeyboardButton[][] = []
         if (response?.count) {
             let replies: string[] = []
-            response.data.forEach((el, index) => {
+            response?.data?.requests.forEach((el, index) => {
                 let date_expire = LocalDate.parse(el.expire_at)
                 let icon = ['🚘', '🚖'][index % 2]
                 replies.push(`${icon} <u>${el.plate}</u> - діє до <code>${date_expire.toLocaleString()}</code>`)
