@@ -2,7 +2,7 @@ import {Conversation, createConversation} from "@ponomarevlad/grammyjs-conversat
 import type {MyContext} from "../index";
 import {backToStart, cancelKeyboard, MENU_CANCEL, MENU_REQUESTS_LIST, MENU_REQUESTS_NEW} from "../helpers/menu";
 import {handleException} from "../helpers/errors";
-import {Composer, InlineKeyboard} from "grammy";
+import {Composer, InlineKeyboard, Keyboard} from "grammy";
 import {isAuthenticated} from "../helpers/auth";
 import type {InlineKeyboardButton} from "grammy/out/types";
 import {createCallbackData} from "callback-data";
@@ -13,6 +13,7 @@ import {sanitizePlate} from "../helpers/sanitize";
 
 const bot = new Composer<MyContext>();
 const requestData = createCallbackData('request', {id: Number})
+const MENU_UNUSUAL_PLATE = 'Номер нестандартний'
 
 async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
     try {
@@ -20,17 +21,28 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
             reply_markup: cancelKeyboard,
             parse_mode: 'HTML'
         })
-        const plateReply = await conversation.waitForHears(/^[А-ЩЬЮЯҐЄІЇA-Z]{2}[0-9]{4}[А-ЩЬЮЯҐЄІЇA-Z]{2}$/i, {
+
+        let plateReply = await conversation.waitForHears([MENU_UNUSUAL_PLATE, /^[А-ЩЬЮЯҐЄІЇA-Z]{2}[0-9]{4}[А-ЩЬЮЯҐЄІЇA-Z]{2}$/i], {
             otherwise: async (ctx) => {
                 if (ctx.msg.text != MENU_CANCEL) {
-                    await ctx.reply("Помилка в номері.\n<em>Без пробілів і спецзнаків. Тільки букви і цифри. Формат - саме <code>ХХ0000ХХ</code></em>", {parse_mode: 'HTML'})
+                    let plate = sanitizePlate(ctx.msg.text ?? ctx.msg.caption)
+                    await ctx.reply(`Помилка в номері - <code>${plate}</code>\n<em>Без пробілів і спецзнаків. Тільки букви і цифри.\nФормат - саме <code>ХХ0000ХХ</code></em>\n\nХочете ввести нестандартний номер?`, {
+                        reply_markup: new Keyboard().text(MENU_UNUSUAL_PLATE).text(MENU_CANCEL),
+                        parse_mode: 'HTML'
+                    })
                 }
-            }
+            },
         })
+
+        if (plateReply.msg.text == MENU_UNUSUAL_PLATE) {
+            await ctx.reply("Добре, введіть нестандартний номер ще раз:", {
+                reply_markup: cancelKeyboard,
+            })
+            plateReply = await conversation.waitFor('message:text')
+        }
 
         const plate = sanitizePlate(plateReply.msg.text ?? plateReply.msg.caption)
         const now = await conversation.now()
-        const date_added = new Date(now)
         const date_expire = new Date(now)
         date_expire.setDate(date_expire.getDate() + 1)
         await conversation.session
@@ -39,7 +51,6 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
             'plate': plate,
             'address': getBuildingName(conversation.session.building) + ', ' + conversation.session.flat,
             'phone': conversation.session.contact.phone_number,
-            // 'created_at': date_added.toISOString(),
             'expire_at': date_expire.toISOString(),
         }
 

@@ -30,7 +30,7 @@ const admins = [
     '380939543331', // 3 Настя
     '380963720485', // 3 Юля
     '380638645550', // 3 Діма
-    '380632521709', // 4 me
+    //'380632521709', // 4 me
     '380503860369', // 4 Іра
     '380675572500', // 5 Наталя
     '380964254933', // 5 Юрій
@@ -41,11 +41,48 @@ const admins = [
     '380984010341', // 10 Катя
 ]
 
+const concierges = [
+    '380501021269',// 6 буд
+    '380501021336',
+    '380501021339',
+'380632521709', // 4 me
+    '380501021354',// 2
+    '380501021406',
+    //'380503279930',
+    '380503936761',// 1
+    '380503936762',
+    '380503936763',
+    '380503936764',// 3
+    '380503936766',
+    '380503936768',
+    '380503936769',// 4
+    '380503936771',
+    '380503936772',
+    '380661294132',// 8
+    '380661294134',
+    '380661294135',
+    '380751233691',// 7
+    '380751233692',
+    '380751233693',
+    '380754531710',// 10
+    '380754531711',
+    '380754531712',
+    '380754531713',
+    '380952943669',// 5
+    '380952943670',
+    '380952943671',
+]
+
 const bot = new Composer<MyContext>();
 
 export async function isAdmin(ctx: MyContext) {
     await ctx.session
     return ctx.session.contact.phone_number && admins.includes(ctx.session.contact.phone_number)
+}
+
+export async function isConcierge(ctx: MyContext) {
+    await ctx.session
+    return ctx.session.contact.phone_number && concierges.includes(ctx.session.contact.phone_number)
 }
 
 export async function isAuthenticated(ctx: MyContext) {

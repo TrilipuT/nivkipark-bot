@@ -1,5 +1,5 @@
 import {Keyboard} from "grammy";
-import {isAdmin} from "./auth";
+import {isAdmin, isConcierge} from "./auth";
 import {MyContext} from "../index";
 
 export const MENU_REQUESTS_NEW = "🆕 Заявка на вїзд"
@@ -12,11 +12,19 @@ export const cancelKeyboard = new Keyboard()
     .text(MENU_CANCEL)
     .resized()
 
+export const wrongPlateKeyboard = new Keyboard()
+    .text()
+    .text(MENU_CANCEL)
+    .resized()
+
 async function getKeyboard(ctx: MyContext) {
     const keyboard = new Keyboard()
         .text(MENU_REQUESTS_NEW)
         .text(MENU_REQUESTS_LIST)
-        .text(MENU_MY_VEHICLES)
+
+    if (!(await isConcierge(ctx))) {
+        keyboard.text(MENU_MY_VEHICLES)
+    }
 
     if (await isAdmin(ctx)) {
         keyboard
