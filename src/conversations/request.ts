@@ -3,13 +3,14 @@ import type {MyContext} from "../index";
 import {backToStart, cancelKeyboard, MENU_CANCEL, MENU_REQUESTS_LIST, MENU_REQUESTS_NEW} from "../helpers/menu";
 import {handleException} from "../helpers/errors";
 import {Composer, InlineKeyboard, Keyboard} from "grammy";
-import {isAuthenticated} from "../helpers/auth";
+import {isAuthenticated, isConcierge} from "../helpers/auth";
 import type {InlineKeyboardButton} from "grammy/out/types";
 import {createCallbackData} from "callback-data";
 import {addRequest, deleteRequest, getRequests} from "../helpers/api";
 import {LocalDate} from '../helpers/date'
 import {getBuildingName} from "nivkipark/src/helpers/buildings";
 import {sanitizePlate} from "../helpers/sanitize";
+import {sanitizePhone} from "nivkipark/src/helpers/sanitize";
 
 const bot = new Composer<MyContext>();
 const requestData = createCallbackData('request', {id: Number})
@@ -17,6 +18,7 @@ const MENU_UNUSUAL_PLATE = 'Номер нестандартний'
 
 async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
     try {
+        // PLATE
         await ctx.reply("<b>Введіть номер авто:</b>\n<em>Використовуйте повний формат</em> <code>ХХ0000ХХ</code>", {
             reply_markup: cancelKeyboard,
             parse_mode: 'HTML'
@@ -34,12 +36,42 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
             },
         })
 
+        // UNUSUAL PLATE
         if (plateReply.msg.text == MENU_UNUSUAL_PLATE) {
             await ctx.reply("Добре, введіть нестандартний номер ще раз:", {
                 reply_markup: cancelKeyboard,
             })
             plateReply = await conversation.waitFor('message:text')
         }
+
+        // IF CONCIERGE ASK FOR PHONE AND FLAT
+        let flat = null
+        let phone = null
+        if (isConcierge(ctx.session.contact.phone_number)) {
+
+            await ctx.reply("<b>Введіть КВАРТИРУ / ПРИМІЩЕННЯ, куди подається заявка:</b>", {
+                reply_markup: cancelKeyboard,
+                parse_mode: 'HTML'
+            })
+            const flatReply = await conversation.waitFor('message:text')
+            flat = flatReply.msg.text
+
+            await ctx.reply("<b>Введіть НОМЕР телефону ХТО ЗРОБИВ ЗАЯВКУ:</b>\n<em>Використовуйте повний формат</em> <code>380ХХХХХХХХХ</code>", {
+                reply_markup: cancelKeyboard,
+                parse_mode: 'HTML'
+            })
+            const phoneReply = await conversation.waitForHears(/^\+?380\d{9}$/i,{
+                otherwise: async (ctx)=>{
+                    await ctx.reply("Помилка в номері.\n<em>Без пробілів і спецзнаків.</em>\n<em>Використовуйте повний формат</em> <code>380ХХХХХХХХХ</code>", {
+                        reply_markup: cancelKeyboard,
+                        parse_mode: 'HTML'
+                    })
+                }
+            })
+            phone = sanitizePhone(phoneReply.msg.text)
+        }
+
+        await ctx.reply("Відправляємо дані...");
 
         const plate = sanitizePlate(plateReply.msg.text ?? plateReply.msg.caption)
         const now = await conversation.now()
@@ -53,8 +85,15 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
             'phone': conversation.session.contact.phone_number,
             'expire_at': date_expire.toISOString(),
         }
+            // If concierge - override some params
+        if (isConcierge(ctx.session.contact.phone_number)) {
+            data.address = getBuildingName(conversation.session.building) + ', ' + flat
+            data.phone = phone
+            data.data = {'created_by_phone': conversation.session.contact.phone_number}
+        }
 
         const result = await addRequest(ctx, data)
+        await conversation.sleep(1000)
         let message = `Авто з номером ${plate} додано.\nТермін дії 24 години - до ${new LocalDate(date_expire).toLocaleString()}.`
         if (!result.ok) {
             message = 'Вибачте, сталась помилка. Спробуйте надіслати заявку пізніше.'

@@ -30,7 +30,7 @@ const admins = [
     '380939543331', // 3 Настя
     '380963720485', // 3 Юля
     '380638645550', // 3 Діма
-    //'380632521709', // 4 me
+    '380632521709', // 4 me
     '380503860369', // 4 Іра
     '380675572500', // 5 Наталя
     '380964254933', // 5 Юрій
@@ -45,7 +45,7 @@ const concierges = [
     '380501021269',// 6 буд
     '380501021336',
     '380501021339',
-'380632521709', // 4 me
+// '380632521709', // 4 me
     '380501021354',// 2
     '380501021406',
     //'380503279930',
@@ -68,9 +68,9 @@ const concierges = [
     '380754531711',
     '380754531712',
     '380754531713',
-    '380952943669',// 5
-    '380952943670',
-    '380952943671',
+    // '380952943669',// 5
+    // '380952943670',
+    // '380952943671',
 ]
 
 const bot = new Composer<MyContext>();
@@ -80,9 +80,8 @@ export async function isAdmin(ctx: MyContext) {
     return ctx.session.contact.phone_number && admins.includes(ctx.session.contact.phone_number)
 }
 
-export async function isConcierge(ctx: MyContext) {
-    await ctx.session
-    return ctx.session.contact.phone_number && concierges.includes(ctx.session.contact.phone_number)
+export function isConcierge(phone_number: string) {
+    return concierges.includes(phone_number)
 }
 
 export async function isAuthenticated(ctx: MyContext) {

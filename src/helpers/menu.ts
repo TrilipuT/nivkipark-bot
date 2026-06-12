@@ -22,7 +22,7 @@ async function getKeyboard(ctx: MyContext) {
         .text(MENU_REQUESTS_NEW)
         .text(MENU_REQUESTS_LIST)
 
-    if (!(await isConcierge(ctx))) {
+    if (!(await isConcierge(ctx.session.contact.phone_number))) {
         keyboard.text(MENU_MY_VEHICLES)
     }
 

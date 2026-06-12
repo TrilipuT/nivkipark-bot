@@ -6,7 +6,7 @@ import {backToStart} from "../helpers/menu";
 import {handleException} from "../helpers/errors";
 import {addUser} from "../helpers/api";
 import {askBuilding, askFlat} from "../helpers/questions";
-import {isUserInChat, isUserInDB} from "../helpers/auth";
+import {isConcierge, isUserInChat, isUserInDB} from "../helpers/auth";
 
 const bot = new Composer<MyContext>();
 
@@ -23,16 +23,18 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
             }
         });
         // ========= Check for contact =========
-        let isInChat = false;
-        let isInDB = false;
+        let isAllowed = false;
         if (contactReply.msg?.contact) {
             // set contact into format without + and -
             contactReply.msg.contact.phone_number = contactReply.msg.contact.phone_number.replace('+', '').replace('-', '')
 
             const statusMessage = await ctx.reply("Звіряємо дані...");
-            isInDB = await conversation.external(async () => await isUserInDB(ctx, contactReply.msg.contact))
-            if (!isInDB) {
-                isInChat = await isUserInChat(ctx, contactReply.msg.contact)
+            isAllowed = await conversation.external(async () => await isUserInDB(ctx, contactReply.msg.contact))
+            if (!isAllowed) {
+                isAllowed = await isUserInChat(ctx, contactReply.msg.contact)
+                if (!isAllowed) {
+                    isAllowed = isConcierge(contactReply.msg.contact.phone_number)
+                }
             }
 
             try {
@@ -43,7 +45,7 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
             }
             // await statusMessage.delete().catch(() => {})
             conversation.session.contact = contactReply.msg.contact;
-            if (!isInDB && !isInChat) {
+            if (!isAllowed) {
                 await ctx.reply(`Вибачте, ваш номер телефону не верифіковано. Для користування ботом звяжіться з представником ОСББ вашого будинку.\nПісля цього натисніть /start нижче.`, {
                     reply_markup: new Keyboard().text('/start').resized().oneTime()
                 })
@@ -63,13 +65,13 @@ export async function greeting(conversation: Conversation<any>, ctx: MyContext) 
         const flat = await askFlat(ctx, conversation, `Вкажіть вашу квартиру:`)
         conversation.session.flat = flat
         // ========= End ask for flat =========
-        if (isInChat && !isInDB) {
-            await addUser(ctx, {
-                phone: conversation.session.contact.phone_number,
-                building: building,
-                flat: flat
-            })
-        }
+        // if (isInChat && !isAllowed) {
+        //     await addUser(ctx, {
+        //         phone: conversation.session.contact.phone_number,
+        //         building: building,
+        //         flat: flat
+        //     })
+        // }
         console.log('auth done')
 
         await backToStart(ctx, `Супер, дякую за авторизацію. Перейдемо до справи.`)
