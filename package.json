@@ -12,7 +12,7 @@
     "prestart": "cloudflared service install eyJhIjoiY2ZjMGNkMWY2ZWEzODVkNGU1NTEwNGFiOTMwYzNkYmQiLCJ0IjoiZGJiYzRlNTgtMDcxMi00YjAwLWE3NTAtYmIxZThkODE5ZDc5IiwicyI6Ik16SmhOV0UzWWpFdE1EUmhOeTAwWXpGaUxUazVOakF0T0dGa1lUY3pOVFJtTUdOaSJ9",
     "start": "wrangler dev",
     "poststart": "cloudflared service uninstall eyJhIjoiY2ZjMGNkMWY2ZWEzODVkNGU1NTEwNGFiOTMwYzNkYmQiLCJ0IjoiZGJiYzRlNTgtMDcxMi00YjAwLWE3NTAtYmIxZThkODE5ZDc5IiwicyI6Ik16SmhOV0UzWWpFdE1EUmhOeTAwWXpGaUxUazVOakF0T0dGa1lUY3pOVFJtTUdOaSJ9",
-    "registerhook": "curl https://api.telegram.org/bot6751459282:AAHSE2JQn6x-PFS9JQ9_K45ZSmbi5uOTV8k/setWebhook?url=https://hon-sir-opinion-seems.trycloudflare.com",
+    "registerhook": "curl https://api.telegram.org/bot6751459282:AAFpUAmOUJT9yz-KPyrRR9WS3p4TE2wpH64/setWebhook?url=https://local-bot.nivkipark.org",
     "deploy": "wrangler deploy --outdir dist && pnpm sentry:sourcemaps",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org nivki-park --project bot ./dist && sentry-cli sourcemaps upload --org nivki-park --project bot ./dist",
     "postinstall": "pnpm update nivkipark"

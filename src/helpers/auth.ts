@@ -3,22 +3,6 @@ import {MyContext} from "../index";
 import {backToStart} from "./menu";
 import {getUsers} from "./api";
 
-// updated as of 06 June
-const blocked = {
-    "b1": [],
-    "b2": [],
-    "b3": [],
-    "b4": [],
-    "b5": [],
-    "b6": [],
-    "b7": [],
-    "b8": [],
-    "b9": [],
-    "b10": [],
-    "b11": [],
-    "b12": [],
-}
-
 // Owners chat id
 const chatId = -1001438308653;
 
@@ -99,12 +83,28 @@ export async function isAuthenticated(ctx: MyContext) {
             reply_markup: new Keyboard().text('/auth').resized().oneTime()
         })
     }
-    const isBlocked = blocked[ctx.session.building] && blocked[ctx.session.building].includes(ctx.session.flat)
-    if (isBlocked) {
+    if (await isBlocked(ctx)) {
         allow = false
-        await backToStart(ctx, '❗️Користування ботом обмежено.❗️\nПеревірте наявність заборгованості перед ОСББ/ЖЕК.\nПісля сплати заборгованності надішліть квитанцію про оплату @dm_domolad або @domoladbot і доступ буде відновлено якнайшвидше. ')
+        await backToStart(ctx, '❗️Користування ботом обмежено.❗️\nПеревірте наявність заборгованості перед ОСББ.\nПісля сплати заборгованності надішліть квитанцію про оплату @dm_domolad або @domoladbot і доступ буде відновлено якнайшвидше. ')
     }
     return allow
+}
+
+export async function isBlocked(ctx: MyContext) {
+    await ctx.session
+    console.log((Date.now() - ctx.session.status_upd_time) / 1000)
+    if (!ctx.session.status_upd_time || (ctx.session.status_upd_time + (5 * 60 * 1000)) < Date.now()) {
+        let users = await getUsers(ctx, {phone: ctx.session.contact.phone_number})
+        if (!users.length) {
+            // not found user - blocked
+            ctx.session.status = 'NOT_FOUND'
+        }
+        console.log(users)
+        ctx.session.status = users[0].status
+        ctx.session.status_upd_time = Date.now()
+    }
+    console.log(ctx.session.status)
+    return ["BLOCKED", "DISABLED", "NOT_FOUND"].includes(ctx.session.status)
 }
 
 /**
