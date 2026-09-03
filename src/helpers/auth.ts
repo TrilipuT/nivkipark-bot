@@ -83,7 +83,9 @@ export async function isAuthenticated(ctx: MyContext) {
             reply_markup: new Keyboard().text('/auth').resized().oneTime()
         })
     }
-    if (await isBlocked(ctx)) {
+    if (isConcierge(ctx.session.contact.phone_number)) {
+        // all good - allow for Concierges
+    } else if (await isBlocked(ctx)) {
         allow = false
         await backToStart(ctx, '❗️Користування ботом обмежено.❗️\nПеревірте наявність заборгованості перед ОСББ.\nПісля сплати заборгованності надішліть квитанцію про оплату @dm_domolad або @domoladbot і доступ буде відновлено якнайшвидше. ')
     }
