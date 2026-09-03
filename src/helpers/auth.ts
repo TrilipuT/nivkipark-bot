@@ -88,6 +88,9 @@ export async function isAuthenticated(ctx: MyContext) {
     } else if (await isBlocked(ctx)) {
         allow = false
         await backToStart(ctx, '❗️Користування ботом обмежено.❗️\nПеревірте наявність заборгованості перед ОСББ.\nПісля сплати заборгованності надішліть квитанцію про оплату @dm_domolad або @domoladbot і доступ буде відновлено якнайшвидше. ')
+    } else if ((ctx.session.status ?? 'ACTIVE') === 'NOT_FOUND') {
+        allow = false
+        await backToStart(ctx, '🤷‍♂️ Ваш номер не знайдено в базі мешканців.\n\nЗвяжіться з ОСББ вашого будинку щоб внести номер в базу.')
     }
     return allow
 }
@@ -109,7 +112,7 @@ export async function isBlocked(ctx: MyContext) {
         ctx.session.status_upd_time = Date.now()
     }
     console.log(ctx.session.status)
-    return ["BLOCKED", "DISABLED", "NOT_FOUND"].includes(ctx.session.status)
+    return ["BLOCKED", "DISABLED"].includes(ctx.session.status)
 }
 
 /**
