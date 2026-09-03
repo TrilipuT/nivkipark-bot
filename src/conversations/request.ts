@@ -1,6 +1,6 @@
 import {Conversation, createConversation} from "@ponomarevlad/grammyjs-conversations";
 import type {MyContext} from "../index";
-import {backToStart, cancelKeyboard, MENU_CANCEL, MENU_REQUESTS_LIST, MENU_REQUESTS_NEW} from "../helpers/menu";
+import {backToStart, cancelKeyboard, MENU_CANCEL, MENU_REQUESTS_LIST, MENU_REQUESTS_NEW, MENU_UNUSUAL_PLATE} from "../helpers/menu";
 import {handleException} from "../helpers/errors";
 import {Composer, InlineKeyboard, Keyboard} from "grammy";
 import {isAuthenticated, isConcierge} from "../helpers/auth";
@@ -14,7 +14,6 @@ import {sanitizePhone} from "nivkipark/src/helpers/sanitize";
 
 const bot = new Composer<MyContext>();
 const requestData = createCallbackData('request', {id: Number})
-const MENU_UNUSUAL_PLATE = 'Номер нестандартний'
 
 async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
     try {
@@ -26,11 +25,14 @@ async function newRequest(conversation: Conversation<any>, ctx: MyContext) {
 
         let plateReply = await conversation.waitForHears([MENU_UNUSUAL_PLATE, /^[А-ЩЬЮЯҐЄІЇA-Z]{2}[0-9]{4}[А-ЩЬЮЯҐЄІЇA-Z]{2}$/i], {
             otherwise: async (ctx) => {
-                if (ctx.msg.text != MENU_CANCEL) {
+                if (ctx.msg?.text != MENU_CANCEL) {
                     let plate = sanitizePlate(ctx.msg.text ?? ctx.msg.caption)
                     await ctx.reply(`Помилка в номері - <code>${plate}</code>\n<em>Без пробілів і спецзнаків. Тільки букви і цифри.\nФормат - саме <code>ХХ0000ХХ</code></em>\n\nХочете ввести нестандартний номер?`, {
-                        reply_markup: new Keyboard().text(MENU_UNUSUAL_PLATE).text(MENU_CANCEL),
-                        parse_mode: 'HTML'
+                        reply_markup: new Keyboard()
+                            .text(MENU_UNUSUAL_PLATE)
+                            .text(MENU_CANCEL)
+                            .resized(),
+                        parse_mode: 'HTML',
                     })
                 }
             },

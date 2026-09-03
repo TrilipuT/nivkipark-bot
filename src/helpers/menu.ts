@@ -7,13 +7,9 @@ export const MENU_REQUESTS_LIST = "🗒 Активні заявки"
 export const MENU_MY_VEHICLES = "🚙 Мої авто"
 export const MENU_CANCEL = '🚮 Відмінити'
 export const MENU_ADD_USER = 'Додати користувача'
+export const MENU_UNUSUAL_PLATE = 'Номер нестандартний'
 
 export const cancelKeyboard = new Keyboard()
-    .text(MENU_CANCEL)
-    .resized()
-
-export const wrongPlateKeyboard = new Keyboard()
-    .text()
     .text(MENU_CANCEL)
     .resized()
 
@@ -21,6 +17,7 @@ async function getKeyboard(ctx: MyContext) {
     const keyboard = new Keyboard()
         .text(MENU_REQUESTS_NEW)
         .text(MENU_REQUESTS_LIST)
+        .resized()
 
     if (!(await isConcierge(ctx.session.contact.phone_number))) {
         keyboard.text(MENU_MY_VEHICLES)

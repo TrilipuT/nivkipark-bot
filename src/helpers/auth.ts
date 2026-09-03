@@ -94,15 +94,18 @@ export async function isAuthenticated(ctx: MyContext) {
 
 export async function isBlocked(ctx: MyContext) {
     await ctx.session
-    console.log((Date.now() - ctx.session.status_upd_time) / 1000)
     if (!ctx.session.status_upd_time || (ctx.session.status_upd_time + (5 * 60 * 1000)) < Date.now()) {
         let users = await getUsers(ctx, {phone: ctx.session.contact.phone_number})
-        if (!users.length) {
-            // not found user - blocked
-            ctx.session.status = 'NOT_FOUND'
+        if (users.length) {
+            ctx.session.status = users[0].status
+        } else {
+            if (await isUserInChat(ctx, ctx.session.contact)) {
+                ctx.session.status = 'ACTIVE'
+            } else {
+                // not found user - blocked
+                ctx.session.status = 'NOT_FOUND'
+            }
         }
-        console.log(users)
-        ctx.session.status = users[0].status
         ctx.session.status_upd_time = Date.now()
     }
     console.log(ctx.session.status)
